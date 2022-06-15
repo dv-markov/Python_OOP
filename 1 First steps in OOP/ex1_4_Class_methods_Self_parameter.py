@@ -69,6 +69,23 @@ f = getattr(pt3, "get_coords")
 print(f)
 print(f())
 
-print()
-print()
+print("""
+Задачи""")
 
+
+# Task 4
+class MediaPlayer:
+
+    def open(self, file):
+        self.filename = file
+
+    def play(self):
+        print('Воспроизведение', self.filename)
+
+
+media1 = MediaPlayer()
+media2 = MediaPlayer()
+media1.open("filemedia1")
+media2.open("filemedia2")
+media1.play()
+media2.play()
