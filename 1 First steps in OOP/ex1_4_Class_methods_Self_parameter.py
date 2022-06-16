@@ -187,6 +187,8 @@ class Translator:
 
     def remove(self, eng):
         del self.D[eng]
+        # Удалять лучше методом pop
+        # self.D.pop(eng, False)
 
     def translate(self, eng):
         return self.D.get(eng, [None])
@@ -227,3 +229,10 @@ print(*tr.translate('go'))
 # tr.remove('car')
 # # print(tr.D)
 # print(*tr.translate('go'))
+
+# Variant 3
+# Объявить словарь в экземпляре класса (внутри метода add):
+# Тогда для каждого экземпляра класса словарь будут уникален
+# def add(self, eng, rus):
+#     if 'tr' not in self.__dict__:
+#         self.tr = {}
