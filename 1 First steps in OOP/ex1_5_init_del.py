@@ -266,3 +266,107 @@ gr_1.set_show(True)
 gr_1.show_bar()
 gr_1.set_show(False)
 gr_1.show_bar()
+
+
+# Task 7
+class CPU:
+    def __init__(self, name, fr):
+        self.name = name
+        self.fr = fr
+
+
+class Memory:
+    def __init__(self, name, volume):
+        self.name = name
+        self.volume = volume
+
+
+class MotherBoard:
+    def __init__(self, name, cpu, mem_slots, total_mem_slots=4):
+        self.name = name
+        self.cpu = cpu
+        # self.total_mem_slots = 4
+        self.total_mem_slots = total_mem_slots
+        self.mem_slots = mem_slots[:total_mem_slots]
+
+    def get_config(self):
+        return [f'Материнская плата: {self.name}',
+                f'Центральный процессор: {self.cpu.name}, {self.cpu.fr}',
+                f'Слотов памяти: {self.total_mem_slots}',
+                'Память: '+'; '.join([f'{x.name} - {x.volume}' for x in self.mem_slots])]
+
+
+# при вызове переменных f-строки использовать предпочтительнее, они быстрее и работают с любыми типами данных
+mb = MotherBoard('Asus', CPU('Intel', '3 GHz'), [Memory('Kingston', '16 Gb'), Memory('Transcend', '16 Gb')])
+print(mb.get_config())
+
+# Variant 2
+# class MotherBoard:
+#     def __init__(self, name, cpu, *mem_slots):
+#         self.name = name
+#         self.cpu = cpu
+#         self.total_mem_slots = 4
+#         self.mem_slots = mem_slots[:self.total_mem_slots]
+#
+# mb = MotherBoard('Asus', CPU('Intel', 3000), Memory('Kingston', 16000), Memory('Transcend', 16000))
+
+
+# Task 8
+class Cart:
+    def __init__(self):
+        self.goods = []
+
+    def add(self, gd):
+        self.goods.append(gd)
+
+    def remove(self, indx):
+        if 0 <= indx < len(self.goods):
+            self.goods.pop(indx)
+
+    def get_list(self):
+        # обращаться к значениям свойств лучше по имени, а не через словарь
+        return [f"{x.name}: {x.price}" for x in self.goods]
+
+        # return [f'{list(x.__dict__.values())[0]}: {list(x.__dict__.values())[1]}' for x in self.goods]
+
+        # return [x.__dict__.values() for x in self.goods]
+        # return list(map(lambda k, v: f"{k}: {v}", [x.__dict__.values() for x in self.goods]))
+
+        # res = []
+        # for good in self.goods:
+        #     k, v = good.__dict__.values()
+        #     res.append(f'{k}: {v}')
+        # return res
+
+
+class Goods:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+
+class Table(Goods):
+    pass
+
+
+class TV(Goods):
+    pass
+
+
+class Notebook(Goods):
+    pass
+
+
+class Cup(Goods):
+    pass
+
+
+cart = Cart()
+cart.add(TV("Samsung", 50000))
+cart.add(TV("LG", 40000))
+cart.add(Table("Unika Moblar", 70000))
+cart.add(Notebook("Apple", 150000))
+cart.add(Notebook("Dell", 100000))
+cart.add(Cup("Starbucks", 2000))
+
+print(cart.get_list())
