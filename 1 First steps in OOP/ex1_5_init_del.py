@@ -370,3 +370,102 @@ cart.add(Notebook("Dell", 100000))
 cart.add(Cup("Starbucks", 2000))
 
 print(cart.get_list())
+
+
+# Task 9
+#
+# import sys
+#
+#
+# class ListObject:
+#     def __init__(self, data):
+#         self.data = data
+#         self.next_obj = None
+#
+#     def link(self, obj):
+#         self.next_obj = obj
+#
+#
+# # считывание списка из входного потока (эту строку не менять)
+# lst_in = list(map(str.strip, sys.stdin.readlines())) # список lst_in в программе не менять
+#
+# # здесь создаются объекты классов и вызываются нужные методы
+# head_obj = ListObject(lst_in[0])
+# obj = head_obj
+#
+# for i in range(1, len(lst_in)):
+#     obj_new = ListObject(lst_in[i])
+#     obj.link(obj_new)
+#     obj = obj_new
+
+
+# Task 10
+from random import sample
+
+
+class Cell:
+    def __init__(self, mine: bool, around_mines=0):
+        self.mine = mine
+        self.around_mines = around_mines
+        self.fl_open = True
+
+
+class GamePole:
+    def __init__(self, N, M):
+        self.N = N
+        self.M = M
+        self.init()
+
+    def init(self):
+        """Инициализация поля с новой расстановкой M мин
+        (случайным образом по игровому полю, разумеется каждая мина должна находиться в отдельной клетке)"""
+        n = self.N
+        mines_list = sample([True, False], k=n**2, counts=[self.M, n**2-self.M])
+        # print(mines_list)
+        mines_list = list(map(Cell, mines_list))
+        self.pole = [mines_list[i*n:(i+1)*n] for i in range(n)]
+        # print(self.pole)
+        for i in range(n):
+            for j in range(n):
+                if not self.pole[i][j].mine:
+                    self.pole[i][j].around_mines = sum([int(x.mine)
+                                                        for row in self.pole[max(i-1, 0):min(i+2, n)]
+                                                        for x in row[max(j-1, 0):min(j+2, n)]
+                                                        ])
+
+    # Variant 2 - not correct
+    # def __init__(self, N, M):
+    #     self.N = N
+    #     self.M = M
+    #     self.pole = [[Cell(False) for j in range(N)] for i in range(N)]
+    #     self.init()
+    #
+    # def init(self):
+    #     """Инициализация поля с новой расстановкой M мин
+    #     (случайным образом по игровому полю, разумеется каждая мина должна находиться в отдельной клетке)"""
+    #     n = self.N
+    #     mines_list = sample([True, False], n**2, counts=[self.M, n**2-self.M])
+    #     # mines_list = [mines_list[i*n:(i+1)*n] for i in range(n)]
+    #     for i in range(n):
+    #         for j in range(n):
+    #             self.pole[i][j].mine = mines_list.pop()
+    #             if not self.pole[i][j].mine:
+    #                 self.pole[i][j].around_mines = sum([int(x.mine)
+    #                                                     for row in self.pole[max(i-1, 0):min(i+2, n)]
+    #                                                     for x in row[max(j-1, 0):min(j+2, n)]
+    #                                                     ])
+
+    def show(self):
+        """Отображение поля в консоли в виде таблицы чисел открытых клеток
+        (если клетка не открыта, то отображается символ #)"""
+        for row in self.pole:
+            for x in row:
+                if x.fl_open:
+                    print('X' if x.mine else x.around_mines, end=' ')
+                else:
+                    print('#', end=' ')
+            print()
+
+
+pole_game = GamePole(10, 12)
+pole_game.show()
