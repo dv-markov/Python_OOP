@@ -64,3 +64,83 @@ print(v5.validate(20))
 
 # в статическом методе рекомендуется использовать параметры, только заданные как аргументы метода
 
+
+# Task 6
+class Factory:
+    @staticmethod
+    def build_sequence():
+        return []
+
+    @staticmethod
+    def build_number(string):
+        return int(string)
+
+
+class Loader:
+    @staticmethod
+    def parse_format(string, factory):
+        seq = factory.build_sequence()
+        for sub in string.split(","):
+            item = factory.build_number(sub)
+            seq.append(item)
+
+        return seq
+
+
+res = Loader.parse_format("1, 2, 3, -5, 10", Factory)
+print(res)
+
+
+# Task 7:
+# import
+
+class FormLogin:
+    def __init__(self, lgn, psw):
+        self.login = lgn
+        self.password = psw
+
+    def render_template(self):
+        return "\n".join(['<form action="#">', self.login.get_html(), self.password.get_html(), '</form>'])
+
+
+class TextInput:
+    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " #  + ascii_lowercase
+    CHARS_CORRECT = CHARS + CHARS.upper() #  + digits
+
+    def __init__(self, name, size=10):
+        self.name = name
+        self.size = size
+
+    def get_html(self):
+        return f"<p class='login'>{self.name}: <input type='text' size={self.size} />"
+
+    @classmethod
+    def check_name(cls, name):
+        if 3 <= len(name) <=50 and set(cls.CHARS_CORRECT) > set(name):
+            return True
+        raise ValueError('некорректное имя поля')
+
+
+class PasswordInput:
+    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " #  + ascii_lowercase
+    CHARS_CORRECT = CHARS + CHARS.upper() #  + digits
+
+    def __init__(self, name, size=10):
+        self.name = name
+        self.size = size
+
+    def get_html(self):
+        return f"<p class='password'>{self.name}: <input type='text' size={self.size} />"
+
+    @classmethod
+    def check_name(cls, name):
+        if 3 <= len(name) <= 50 and set(cls.CHARS_CORRECT) > set(name):
+            return True
+        raise ValueError('некорректное имя поля')
+
+
+login = FormLogin(TextInput("Логин"), PasswordInput("Пароль"))
+html = login.render_template()
+print(html)
+print(TextInput.check_name("Логин"))
+print(PasswordInput.check_name("Пароль"))
