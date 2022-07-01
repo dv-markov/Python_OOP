@@ -92,7 +92,7 @@ print(res)
 
 
 # Task 7:
-# import
+from string import ascii_lowercase, digits
 
 class FormLogin:
     def __init__(self, lgn, psw):
@@ -104,11 +104,12 @@ class FormLogin:
 
 
 class TextInput:
-    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " #  + ascii_lowercase
-    CHARS_CORRECT = CHARS + CHARS.upper() #  + digits
+    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " + ascii_lowercase
+    CHARS_CORRECT = CHARS + CHARS.upper() + digits
 
     def __init__(self, name, size=10):
-        self.name = name
+        if self.check_name(name):
+            self.name = name
         self.size = size
 
     def get_html(self):
@@ -116,17 +117,18 @@ class TextInput:
 
     @classmethod
     def check_name(cls, name):
-        if 3 <= len(name) <=50 and set(cls.CHARS_CORRECT) > set(name):
+        if 3 <= len(name) <= 50 and set(name).issubset(cls.CHARS_CORRECT):
             return True
-        raise ValueError('некорректное имя поля')
+        raise ValueError("некорректное поле name")
 
 
 class PasswordInput:
-    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " #  + ascii_lowercase
-    CHARS_CORRECT = CHARS + CHARS.upper() #  + digits
+    CHARS = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя " + ascii_lowercase
+    CHARS_CORRECT = CHARS + CHARS.upper() + digits
 
     def __init__(self, name, size=10):
-        self.name = name
+        if self.check_name(name):
+            self.name = name
         self.size = size
 
     def get_html(self):
@@ -134,9 +136,9 @@ class PasswordInput:
 
     @classmethod
     def check_name(cls, name):
-        if 3 <= len(name) <= 50 and set(cls.CHARS_CORRECT) > set(name):
+        if 3 <= len(name) <= 50 and set(name).issubset(cls.CHARS_CORRECT):
             return True
-        raise ValueError('некорректное имя поля')
+        raise ValueError("некорректное поле name")
 
 
 login = FormLogin(TextInput("Логин"), PasswordInput("Пароль"))
@@ -144,3 +146,47 @@ html = login.render_template()
 print(html)
 print(TextInput.check_name("Логин"))
 print(PasswordInput.check_name("Пароль"))
+
+
+# Task 8
+from string import ascii_lowercase, digits
+
+
+class CardCheck:
+    CHARS_FOR_NAME = ascii_lowercase.upper() + digits
+
+    @staticmethod
+    def check_card_number(number: str):
+        if len(number) != 19 or '-' not in number:
+            return False
+        for num in number.split('-'):
+            if len(num) != 4 or not set(num).issubset(digits):
+                return False
+        return True
+
+    @classmethod
+    def check_name(cls, name: str):
+        if ' ' not in name or not set(name).issubset(cls.CHARS_FOR_NAME + ' ') or len(name.split()) != 2:
+            return False
+        return True
+
+
+print(digits)
+is_number = CardCheck.check_card_number("1234-5678-9012-0000")
+print(is_number)
+is_name = CardCheck.check_name("SERGEI BALAKIREV")
+print(is_name)
+
+# Variant 2 - регулярные выражения
+# import re
+#
+#
+# class CardCheck:
+#     @staticmethod
+#     def check_card_number(number):
+#         return bool(re.fullmatch(r"\d{4}(?:-\d{4}){3}", number))
+#
+#     @staticmethod
+#     def check_name(name):
+#         return bool(re.fullmatch(r"[A-Z\d]+ [A-Z\d]+", name))
+
