@@ -190,3 +190,134 @@ print(is_name)
 #     def check_name(name):
 #         return bool(re.fullmatch(r"[A-Z\d]+ [A-Z\d]+", name))
 
+
+# Task 9
+class Video:
+    def create(self, name):
+        self.name = name
+
+    def play(self):
+        print(f"воспроизведение видео {self.name}")
+
+
+class YouTube:
+    videos = []
+
+    @classmethod
+    def add_video(cls, video):
+        cls.videos.append(video)
+
+    @classmethod
+    def play(cls, video_indx):
+        if video_indx < len(cls.videos):
+            cls.videos[video_indx].play()
+
+
+v1 = Video()
+v2 = Video()
+v1.create("Python")
+v2.create("Python ООП")
+YouTube.add_video(v1)
+YouTube.add_video(v2)
+YouTube.play(0)
+YouTube.play(1)
+
+
+# Task 10
+class AppStore:
+    def __init__(self):
+        self.app_lst = []
+
+    def add_application(self, app):
+        self.app_lst.append(app)
+
+    def remove_application(self, app):
+        if app in self.app_lst:
+            self.app_lst.remove(app)
+
+    def block_application(self, app):
+        if app in self.app_lst:
+            app.blocked = True
+
+    def total_apps(self):
+        return len(self.app_lst)
+
+
+class Application:
+    def __init__(self, name, blocked=False):
+        self.name = name
+        self.blocked = blocked
+
+
+store = AppStore()
+app_youtube = Application("Youtube")
+store.add_application(app_youtube)
+print(store.__dict__)
+print(*(x.__dict__ for x in store.app_lst))
+
+store.add_application(Application("VK"))
+print(store.__dict__)
+print(*(x.__dict__ for x in store.app_lst))
+
+store.block_application(app_youtube)
+print(store.__dict__)
+print(*(x.__dict__ for x in store.app_lst))
+
+store.remove_application(app_youtube)
+print(store.__dict__)
+
+print(id(app_youtube))
+
+# Variant 2
+# def block_application(self, app):
+#     if isinstance(app, Application):
+#         app.blocked = True
+#     else:
+#         TypeError("Argument is not instance of Application")
+
+
+# Task 10
+class Viber:
+    msg_list = []
+
+    @classmethod
+    def add_message(cls, msg):
+        cls.msg_list.append(msg)
+
+    @classmethod
+    def remove_message(cls, msg):
+        cls.msg_list.remove(msg)
+
+    @staticmethod
+    def set_like(msg):
+        msg.fl_like = not msg.fl_like
+
+    @classmethod
+    def show_last_message(cls, n=1):
+        if type(n) == int and n != 0:
+            for m in cls.msg_list[-n:]:
+                print(m.text)
+
+    @classmethod
+    def total_messages(cls):
+        return len(cls.msg_list)
+
+
+class Message:
+    def __init__(self, text):
+        self.text = text
+        self.fl_like = False
+
+
+msg = Message("Всем привет!")
+Viber.add_message(msg)
+Viber.add_message(Message("Это курс по Python ООП."))
+Viber.add_message(Message("Что вы о нем думаете?"))
+Viber.show_last_message()
+Viber.show_last_message(3)
+Viber.set_like(msg)
+Viber.remove_message(msg)
+
+# lst = [1, 2, 3, 4, 5]
+# n = 0
+# print(*lst[-n:], sep='\n')
