@@ -227,6 +227,7 @@ YouTube.play(1)
 class AppStore:
     def __init__(self):
         self.app_lst = []
+        # можно также хранить перечень приложений в словаре, где ключ это id объекта app, а значение - его адрес
 
     def add_application(self, app):
         self.app_lst.append(app)
@@ -276,9 +277,10 @@ print(id(app_youtube))
 #         TypeError("Argument is not instance of Application")
 
 
-# Task 10
+# Task 11
 class Viber:
     msg_list = []
+    # хранить объекты msg можно в словаре, ключ - id объекта msg, значение - сам объект
 
     @classmethod
     def add_message(cls, msg):
