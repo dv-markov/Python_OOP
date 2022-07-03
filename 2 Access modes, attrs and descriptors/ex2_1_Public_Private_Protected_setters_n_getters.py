@@ -159,3 +159,84 @@ print(pt.get_coord())
 # выдает ошибку accessify.errors.InaccessibleDueToItsProtectionLevelException:
 # Point.check_value() is inaccessible due to its protection level
 
+
+print("""
+ЗАДАЧИ""")
+
+
+# Task 3
+class Clock:
+    def __init__(self, tm=0):
+        self.__time = 0
+        if self.__check_time(tm):
+            self.__time = tm
+
+    def set_time(self, tm):
+        if self.__check_time(tm):
+            self.__time = tm
+
+    def get_time(self):
+        return self.__time
+
+    @staticmethod
+    def __check_time(tm):
+        return type(tm) == int and 0 <= tm <= 100_000
+
+
+clock0 = Clock('500')
+print(clock0.get_time())
+clock0.set_time(100)
+print(clock0.get_time())
+
+clock = Clock(4530)
+print(clock.get_time())
+
+# Variant 2
+# class Clock:
+#     MIN_TIME = 0
+#     MAX_TIME = 100_000
+#
+#     def __init__(self, time=0):
+#         self.__time = time if self.__check_time(time) else 0
+#
+#     def set_time(self, tm):
+#         if self.__check_time(tm):
+#             self.__time = tm
+#
+#     def get_time(self):
+#         return self.__time
+#
+#     @classmethod
+#     def __check_time(cls, tm):
+#         return type(tm) is int and cls.MIN_TIME <= tm < cls.MAX_TIME
+
+
+# Task 4
+class Money:
+    def __init__(self, money):
+        if self.__check_money(money):
+            self.__money = money
+
+    def set_money(self, money):
+        if self.__check_money(money):
+            self.__money = money
+
+    def get_money(self):
+        return self.__money
+
+    def add_money(self, mn):
+        self.__money += mn.get_money()
+
+    @staticmethod
+    def __check_money(mn):
+        return type(mn) == int and mn >= 0
+
+
+mn_1 = Money(10)
+mn_2 = Money(20)
+mn_1.set_money(100)
+mn_2.add_money(mn_1)
+m1 = mn_1.get_money()    # 100
+m2 = mn_2.get_money()    # 120
+
+print(m1, m2)
