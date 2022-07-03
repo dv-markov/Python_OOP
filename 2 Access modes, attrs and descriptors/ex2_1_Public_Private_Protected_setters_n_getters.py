@@ -342,6 +342,7 @@ class Rectangle:
     def draw(self):
         print(f"Прямоугольник с координатами: {self.__sp.get_coords()} {self.__ep.get_coords()}")
 
+
 pt = Point(100, 200)
 print(pt.__dict__)
 print(pt.get_coords())
