@@ -356,3 +356,106 @@ rect2.set_coords(Point(500, 500), Point(700, 700))
 print(rect2.get_coords())
 rect2.draw()
 
+
+# Task 9
+class LinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+
+    def add_obj(self, obj):
+        if self.tail is None or self.head is None:
+            self.head = self.tail = obj
+        # if self.tail is None:
+        #     self.tail = obj
+        else:
+            obj.set_prev(self.tail)
+            self.tail.set_next(obj)
+            self.tail = obj
+
+    def remove_obj(self):
+        if self.tail is None:
+            pass
+        elif self.tail.get_prev() is None:
+            self.head = self.tail = None
+        else:
+            self.tail = self.tail.get_prev()
+            self.tail.set_next(None)
+
+    # def remove_obj(self):
+    #     """удаление последнего объекта из связного списка"""
+    #     if self.tail is None or self.tail.get_prev() is None:
+    #         self.head = self.tail = None
+    #     else:
+    #         self.tail = self.tail.get_prev()
+    #         self.tail.set_next(None)
+
+    def get_data(self):
+        obj = self.head
+        res_lst = []
+        while obj:
+            res_lst.append(obj.get_data())
+            obj = obj.get_next()
+        return res_lst or None
+
+        # if self.head:
+        #     obj = self.head
+        #     res_lst = [obj.get_data()]
+        #     while obj.get_next():
+        #         obj = obj.get_next()
+        #         res_lst.append(obj.get_data())
+        #     return res_lst
+
+    # работает (рекурсия)
+    # def get_data(self, obj=None, res_lst=None):
+    #     if res_lst is None:
+    #         res_lst = []
+    #     if obj is None and self.head:
+    #         obj = self.head
+    #     res_lst.append(obj.get_data())
+    #     if obj.get_next():
+    #         next_obj = obj.get_next()
+    #         self.get_data(next_obj, res_lst)
+    #     return res_lst
+
+
+class ObjList:
+    def __init__(self, data):
+        self.__next = None
+        self.__prev = None
+        self.__data = data
+
+    def set_next(self, obj):
+        self.__next = obj
+
+    def set_prev(self, obj):
+        self.__prev = obj
+
+    def get_next(self):
+        return self.__next
+
+    def get_prev(self):
+        return self.__prev
+
+    def set_data(self, data):
+        self.__data = data
+
+    def get_data(self):
+        return self.__data
+
+
+lst = LinkedList()
+lst.add_obj(ObjList("данные 1"))
+lst.add_obj(ObjList("данные 2"))
+lst.add_obj(ObjList("данные 3"))
+res = lst.get_data()  # ['данные 1', 'данные 2', 'данные 3']
+print(res)
+
+lst.remove_obj()
+lst.remove_obj()
+print(lst.get_data())
+
+lst.remove_obj()
+lst.remove_obj()
+lst.remove_obj()
+print(lst.get_data())
