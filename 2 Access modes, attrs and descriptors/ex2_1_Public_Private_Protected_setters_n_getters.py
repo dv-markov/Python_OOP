@@ -433,10 +433,10 @@ print(lst.get_data())
 
 # Task 10
 from string import ascii_lowercase, digits
-
+from random import choices, randint
 
 class EmailValidator:
-    ALLOWED_CHARS = set(ascii_lowercase + digits + '_.@')
+    ALLOWED_CHARS = ascii_lowercase + digits + '_.'
     NAME_LEN = 100
     DOMAIN_LEN = 50
 
@@ -452,7 +452,7 @@ class EmailValidator:
         em = email.lower()
         if not cls.__is_email_str(em):
             return False
-        if em.count('@') != 1 or '..' in em or not set(em).issubset(cls.ALLOWED_CHARS):
+        if em.count('@') != 1 or '..' in em or not set(em).issubset(cls.ALLOWED_CHARS + '@'):
             return False
         else:
             em_s = em.split('@')
@@ -460,6 +460,10 @@ class EmailValidator:
                 return True
             else:
                 return False
+
+    @classmethod
+    def get_random_email(cls):
+        return ''.join(choices(cls.ALLOWED_CHARS, k=randint(2, cls.NAME_LEN))) + '@gmail.com'
 
 
 test_email = 'hello@world.com'
@@ -469,7 +473,7 @@ print(id(EmailValidator.ALLOWED_CHARS))
 print(EmailValidator.check_email('wrongemail'))
 print(id(EmailValidator.ALLOWED_CHARS))
 
-
+print(EmailValidator.get_random_email())
 
 
 
