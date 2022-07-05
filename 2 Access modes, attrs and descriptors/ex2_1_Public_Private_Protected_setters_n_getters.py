@@ -122,37 +122,37 @@ print(dir(pt))
 print(pt._Point__x)  # так делать крайне не рекомендуется, иначе возможны непредвиденные ошибки
 print(pt._Point__check_value(5))  # с защищенным методом аналогично
 
-
-from accessify import private, protected
-
-
-# защита методов класса от доступа извне с помощью accessify
-class Point:
-    def __init__(self, x=0, y=0):
-        self.__x = self.__y = 0
-        if self.check_value(x) and self.check_value(y):
-            self.__x = x
-            self.__y = y
-
-    @private
-    @classmethod
-    def check_value(cls, x):
-        return type(x) in (int, float)
-
-    def set_coord(self, x, y):
-        if self.check_value(x) and self.check_value(y):
-            self.__x = x
-            self.__y = y
-        else:
-            raise ValueError("координаты должны быть числами")
-
-    def get_coord(self):
-        return self.__x, self.__y
-
-
-pt = Point(1, 2)
-pt.set_coord(300, 500)
-print(pt.get_coord())
+# установить accessify на рабочий ноут
+# from accessify import private, protected
+#
+#
+# # защита методов класса от доступа извне с помощью accessify
+# class Point:
+#     def __init__(self, x=0, y=0):
+#         self.__x = self.__y = 0
+#         if self.check_value(x) and self.check_value(y):
+#             self.__x = x
+#             self.__y = y
+#
+#     @private
+#     @classmethod
+#     def check_value(cls, x):
+#         return type(x) in (int, float)
+#
+#     def set_coord(self, x, y):
+#         if self.check_value(x) and self.check_value(y):
+#             self.__x = x
+#             self.__y = y
+#         else:
+#             raise ValueError("координаты должны быть числами")
+#
+#     def get_coord(self):
+#         return self.__x, self.__y
+#
+#
+# pt = Point(1, 2)
+# pt.set_coord(300, 500)
+# print(pt.get_coord())
 
 # работа accessify
 # print(pt.check_value(5))
@@ -366,8 +366,6 @@ class LinkedList:
     def add_obj(self, obj):
         if self.tail is None or self.head is None:
             self.head = self.tail = obj
-        # if self.tail is None:
-        #     self.tail = obj
         else:
             obj.set_prev(self.tail)
             self.tail.set_next(obj)
@@ -382,14 +380,6 @@ class LinkedList:
             self.tail = self.tail.get_prev()
             self.tail.set_next(None)
 
-    # def remove_obj(self):
-    #     """удаление последнего объекта из связного списка"""
-    #     if self.tail is None or self.tail.get_prev() is None:
-    #         self.head = self.tail = None
-    #     else:
-    #         self.tail = self.tail.get_prev()
-    #         self.tail.set_next(None)
-
     def get_data(self):
         obj = self.head
         res_lst = []
@@ -397,26 +387,6 @@ class LinkedList:
             res_lst.append(obj.get_data())
             obj = obj.get_next()
         return res_lst or None
-
-        # if self.head:
-        #     obj = self.head
-        #     res_lst = [obj.get_data()]
-        #     while obj.get_next():
-        #         obj = obj.get_next()
-        #         res_lst.append(obj.get_data())
-        #     return res_lst
-
-    # работает (рекурсия)
-    # def get_data(self, obj=None, res_lst=None):
-    #     if res_lst is None:
-    #         res_lst = []
-    #     if obj is None and self.head:
-    #         obj = self.head
-    #     res_lst.append(obj.get_data())
-    #     if obj.get_next():
-    #         next_obj = obj.get_next()
-    #         self.get_data(next_obj, res_lst)
-    #     return res_lst
 
 
 class ObjList:
@@ -459,3 +429,49 @@ lst.remove_obj()
 lst.remove_obj()
 lst.remove_obj()
 print(lst.get_data())
+
+
+# Task 10
+from string import ascii_lowercase, digits
+
+
+class EmailValidator:
+    ALLOWED_CHARS = set(ascii_lowercase + digits + '_.@')
+    NAME_LEN = 100
+    DOMAIN_LEN = 50
+
+    def __new__(cls, *args, **kwargs):
+        pass
+
+    @staticmethod
+    def __is_email_str(email):
+        return type(email) == str
+
+    @classmethod
+    def check_email(cls, email):
+        em = email.lower()
+        if not cls.__is_email_str(em):
+            return False
+        if em.count('@') != 1 or '..' in em or not set(em).issubset(cls.ALLOWED_CHARS):
+            return False
+        else:
+            em_s = em.split('@')
+            if len(em_s[0]) <= cls.NAME_LEN and len(em_s[1]) <= cls.DOMAIN_LEN and '.' in em_s[1]:
+                return True
+            else:
+                return False
+
+
+test_email = 'hello@world.com'
+print(id(EmailValidator.ALLOWED_CHARS))
+print(EmailValidator.check_email(test_email))
+print(id(EmailValidator.ALLOWED_CHARS))
+print(EmailValidator.check_email('wrongemail'))
+print(id(EmailValidator.ALLOWED_CHARS))
+
+
+
+
+
+
+
