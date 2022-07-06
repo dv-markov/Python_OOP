@@ -93,3 +93,73 @@ print(p.age, p.__dict__)
 del p.age
 print(p.__dict__)
 
+
+print("""
+Задачи""")
+
+
+# Task 4
+class Car:
+    def __init__(self):
+        self.__model = None
+
+    @property
+    def model(self):
+        return self.__model
+
+    @model.setter
+    def model(self, model):
+        if type(model) == str and 2 <= len(model) <= 100:
+            self.__model = model
+
+
+car = Car()
+print(car.model)
+car.model = "Toyota"
+print(car.model)
+
+
+# Task 5
+class WindowDlg:
+    def __init__(self, title, width, height):
+        self.__title = title if self.__check_title(title) else None
+        self.__width = width if self.__check_size(width) else None
+        self.__height = height if self.__check_size(height) else None
+
+    @staticmethod
+    def __check_title(title):
+        return type(title) == str
+
+    @staticmethod
+    def __check_size(size):
+        return type(size) == int and 0 <= size <= 10_000
+
+    @property
+    def width(self):
+        return self.__width
+
+    @width.setter
+    def width(self, width):
+        if self.__check_size(width):
+            self.__width = width
+            self.show()
+
+    @property
+    def height(self):
+        return self.__height
+
+    @height.setter
+    def height(self, height):
+        if self.__check_size(height):
+            self.__height = height
+            self.show()
+
+    def show(self):
+        print(f"{self.__title}: {self.width}, {self.height}")
+
+
+wnd = WindowDlg('Title 1', 700, 500)
+print(wnd.__dict__)
+wnd.show()
+wnd.width = 300
+wnd.height = 150
