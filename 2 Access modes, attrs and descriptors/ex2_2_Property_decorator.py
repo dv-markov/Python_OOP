@@ -163,3 +163,79 @@ print(wnd.__dict__)
 wnd.show()
 wnd.width = 300
 wnd.height = 150
+
+
+# Task 6
+class StackObj:
+    def __init__(self, data):
+        self.__data = data
+        self.__next = None
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.__data = data
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, nxt):
+        if isinstance(nxt, StackObj) or nxt is None:
+            self.__next = nxt
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.last = None
+
+    def push(self, obj):
+        if not self.top:
+            self.top = obj
+        if self.last:
+            self.last.next = obj
+        self.last = obj
+
+    def pop(self):
+        if self.top is None:
+            return None
+        elif self.top == self.last:
+            current_obj = self.last
+            self.top = self.last = None
+            return current_obj
+        else:
+            prev_obj = None
+            current_obj = self.top
+            while current_obj != self.last:
+                prev_obj = current_obj
+                current_obj = current_obj.next
+            prev_obj.next = None
+            self.last = prev_obj
+            return current_obj
+
+    def get_data(self):
+        obj = self.top
+        res = []
+        while obj:
+            res.append(obj.data)
+            obj = obj.next
+        return res
+
+
+st = Stack()
+st.push(StackObj("obj1"))
+st.push(StackObj("obj2"))
+st.push(StackObj("obj3"))
+print(st.pop().data)
+# print(st.pop().data)
+# print(st.pop().data)
+# print(st.pop())
+print()
+
+res = st.get_data()    # ['obj1', 'obj2']
+print(res)
