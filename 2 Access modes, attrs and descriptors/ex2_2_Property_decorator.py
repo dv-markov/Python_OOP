@@ -239,3 +239,125 @@ print()
 
 res = st.get_data()    # ['obj1', 'obj2']
 print(res)
+
+
+# Task 7
+class RadiusVector2D:
+    MIN_COORD = -100
+    MAX_COORD = 1024
+
+    def __init__(self, x=0, y=0):
+        self.__x = self.__y = 0
+        self.x = x
+        self.y = y
+
+    def __check_coord(self, c):
+        return type(c) in (int, float) and self.MIN_COORD <= c <= self.MAX_COORD
+
+    @property
+    def x(self):
+        return self.__x
+
+    @x.setter
+    def x(self, x):
+        if self.__check_coord(x):
+            self.__x = x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @y.setter
+    def y(self, y):
+        if self.__check_coord(y):
+            self.__y = y
+
+    @staticmethod
+    def norm2(vector):
+        if isinstance(vector, RadiusVector2D):
+            return vector.x**2 + vector.y**2
+
+
+v1 = RadiusVector2D()        # радиус-вектор с координатами (0; 0)
+print(v1.__dict__)
+v2 = RadiusVector2D(1)       # радиус-вектор с координатами (1; 0)
+print(v2.__dict__)
+v3 = RadiusVector2D(1, 2)    # радиус-вектор с координатами (1; 2)
+v3.x = 'asdf'
+v3.y = -5000
+print(v3.__dict__)
+print(RadiusVector2D.norm2(v1))
+print(v2.norm2(v2))
+print(v2.norm2(v3))
+
+r5 = RadiusVector2D(-102, 2000)
+print(r5.__dict__)
+
+
+# Task 8
+print('\n', "Decision Trees", sep='')
+
+
+class TreeObj:
+    def __init__(self, indx, value=None):
+        self.indx = indx
+        self.value = value
+        self.__left = None
+        self.__right = None
+
+    @property
+    def left(self):
+        return self.__left
+
+    @left.setter
+    def left(self, l):
+        if isinstance(l, TreeObj):
+            self.__left = l
+
+    @property
+    def right(self):
+        return self.__right
+
+    @right.setter
+    def right(self, r):
+        if isinstance(r, TreeObj):
+            self.__right = r
+
+
+class DecisionTree:
+    @classmethod
+    def predict(cls, root, x):
+        obj = root
+        while obj.left or obj.right:
+            if x[obj.indx] == 1:
+                obj = obj.left
+            else:
+                obj = obj.right
+        return obj.value
+
+    @classmethod
+    def add_obj(cls, obj, node=None, left=True):
+        if node:
+            if left:
+                node.left = obj
+            else:
+                node.right = obj
+        return obj
+
+
+root = DecisionTree.add_obj(TreeObj(0))
+print('root node: ', root)
+v_11 = DecisionTree.add_obj(TreeObj(1), root)
+v_12 = DecisionTree.add_obj(TreeObj(2), root, False)
+DecisionTree.add_obj(TreeObj(-1, "будет программистом"), v_11)
+DecisionTree.add_obj(TreeObj(-1, "будет кодером"), v_11, False)
+DecisionTree.add_obj(TreeObj(-1, "не все потеряно"), v_12)
+DecisionTree.add_obj(TreeObj(-1, "безнадежен"), v_12, False)
+
+x = [1, 1, 0]
+res = DecisionTree.predict(root, x)  # будет программистом
+print(res)
+
+x = [0, 0, 1]
+res1 = DecisionTree.predict(root, x)  #не все потеряно
+print(res1)
