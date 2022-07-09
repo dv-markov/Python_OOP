@@ -38,11 +38,11 @@ print(p.age, p.__dict__)
 # Приоритет объекта property выше, чем при обращении к локальным экземплярам класса
 # Объект property использовать удобнее, чем стандартные геттеры и сеттеры
 
-x = property()
+pr = property()
 # Объект класса property имеет 3 встроенных метода, это декораторы
-# x.setter()
-# x.getter()
-# x.deleter()
+# pr.setter()
+# pr.getter()
+# pr.deleter()
 print()
 
 
@@ -361,3 +361,43 @@ print(res)
 x = [0, 0, 1]
 res1 = DecisionTree.predict(root, x)  #не все потеряно
 print(res1)
+
+
+# Task 9
+class LineTo:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+class PathLines:
+    def __init__(self, *args):
+        self.line_list = list(args)
+
+    def get_path(self):
+        return self.line_list
+
+    def get_length(self):
+        return sum(self.__line_len(i) for i in range(len(self.line_list)))
+
+    def add_line(self, line):
+        if isinstance(line, LineTo):
+            self.line_list.append(line)
+
+    def __line_len(self, i):
+        lst = self.line_list
+        x0 = lst[i-1].x if i > 0 else 0
+        x1 = lst[i].x
+        y0 = lst[i-1].y if i > 0 else 0
+        y1 = lst[i].y
+        return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
+
+
+p0 = PathLines(1, 2, 3)
+print(p0.get_path())
+p = PathLines(LineTo(10, 20), LineTo(10, 30))
+dist = p.get_length()
+print(dist)
+p.add_line(LineTo(20, -10))
+dist = p.get_length()
+print(dist)
