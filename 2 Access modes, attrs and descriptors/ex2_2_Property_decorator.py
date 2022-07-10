@@ -409,8 +409,8 @@ class LineTo:
         self.x = x
         self.y = y
 
-    def length(self, x1, y2):
-        return ((self.x - x1) ** 2 + (self.y - y2) ** 2) ** 0.5
+    def length(self, x0, y0):
+        return ((self.x - x0) ** 2 + (self.y - y0) ** 2) ** 0.5
 
 
 class PathLines:
@@ -431,11 +431,56 @@ class PathLines:
         return length
 
 
-p0 = PathLines(1, 2, 3)
-print(p0.get_path())
-p = PathLines(LineTo(10, 20), LineTo(10, 30))
+p = PathLines(LineTo(100, 200), LineTo(10, 30))
 dist = p.get_length()
 print(dist)
 p.add_line(LineTo(20, -10))
 dist = p.get_length()
 print(dist)
+
+
+# Task 10
+class PhoneBook:
+    def __init__(self):
+        self.phone_list = []
+
+    def add_phone(self, phone):
+        if isinstance(phone, PhoneNumber):
+            self.phone_list.append(phone)
+
+    def remove_phone(self, indx):
+        if type(indx) == int and indx < len(self.phone_list):
+            self.phone_list.pop(indx)
+
+    def get_phone_list(self):
+        return self.phone_list
+
+
+class PhoneNumber:
+    def __new__(cls, *args, **kwargs):
+        if cls.__is_number(args[0]) and cls.__is_fio(args[1]):
+            return super().__new__(cls)
+        else:
+            print('Ошибка входных данных')
+
+    @staticmethod
+    def __is_number(n):
+        return type(n) == int and len(str(n)) == 11
+
+    @staticmethod
+    def __is_fio(f):
+        return type(f) == str
+
+    def __init__(self, number, fio):
+        self.number = number
+        self.fio = fio
+
+
+p = PhoneBook()
+p.add_phone(PhoneNumber(12345678901, "Сергей Балакирев"))
+p.remove_phone(0)
+p.add_phone(PhoneNumber(21345678901, "Панда"))
+phones = p.get_phone_list()
+print(phones)
+for ph in phones:
+    print(ph.number, ph.fio)
