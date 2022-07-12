@@ -233,3 +233,118 @@ print(book.__dict__)
 #
 # book = Book(title="Python ООП", author="Сергей Балакирев", year=2022, pages=123)
 
+
+# Task 4
+class Shop:
+    def __init__(self, shop_name):
+        self.shop_name = shop_name
+        self.goods = []
+
+    def add_product(self, product):
+        self.goods.append(product)
+
+    def remove_product(self, product):
+        self.goods.remove(product)
+
+
+class Product:
+    attrs = {'id': (int, ), 'name': (str, ), 'weight': (int, float), 'price': (int, float)}
+    __id = 0
+
+    @classmethod
+    def __get_id(cls):
+        cls.__id += 1
+        return cls.__id
+
+    def __init__(self, name, weight, price):
+        self.id = self.__get_id()
+        self.name = name
+        self.weight = weight
+        self.price = price
+
+    def __setattr__(self, key, value):
+        if type(value) not in self.attrs.get(key) or key in ('weight', 'price') and value <= 0:
+            # not isinstance(value, self.attrs.get(key))
+            raise TypeError("Неверный тип присваиваемых данных.")
+        super().__setattr__(key, value)
+
+    def __delattr__(self, item):
+        if item == 'id':
+            raise AttributeError("Атрибут id удалять запрещено.")
+        super().__delattr__(item)
+
+
+shop = Shop("Балакирев и К")
+book = Product("Python ООП", 100, 1024)
+shop.add_product(book)
+shop.add_product(Product("Python", 150, 512))
+shop.remove_product(book)
+for p in shop.goods:
+    print(f"{p.name}, {p.weight}, {p.price}")
+
+
+# Task 5
+class Course:
+    def __init__(self, name):
+        self.name = name
+        self.modules = []
+
+    def add_module(self, module):
+        self.modules.append(module)
+
+    def remove_module(self, indx):
+        self.modules.pop(indx)
+
+
+class Module:
+    def __init__(self, name):
+        self.name = name
+        self.lessons = []
+
+    def add_lesson(self, lesson):
+        self.lessons.append(lesson)
+
+    def remove_lesson(self, indx):
+        self.lessons.pop(indx)
+
+
+class LessonItem:
+    title: str
+    practices: int
+    duration: int
+
+    def __init__(self, title, practices, duration):
+        self.title = title
+        self.practices = practices
+        self.duration = duration
+
+    def __setattr__(self, key, value):
+        if not isinstance(value, self.__annotations__.get(key)) or type(value) == int and value <= 0:
+            raise TypeError("Неверный тип присваиваемых данных.")
+        return super().__setattr__(key, value)
+
+    def __getattr__(self, item):
+        return False
+
+    def __delattr__(self, item):
+        if item not in self.__annotations__:
+            super().__delattr__(item)
+
+
+course = Course("Python ООП")
+module_1 = Module("Часть первая")
+module_1.add_lesson(LessonItem("Урок 1", 7, 1000))
+module_1.add_lesson(LessonItem("Урок 2", 10, 1200))
+module_1.add_lesson(LessonItem("Урок 3", 5, 800))
+module_1.remove_lesson(0)
+course.add_module(module_1)
+module_2 = Module("Часть вторая")
+module_2.add_lesson(LessonItem("Урок 1", 7, 1000))
+module_2.add_lesson(LessonItem("Урок 2", 10, 1200))
+course.add_module(module_2)
+delattr(module_2.lessons[0], 'title')
+
+for mod in course.modules:
+    print(mod.name)
+    for lsn in mod.lessons:
+        print(lsn.__dict__)
