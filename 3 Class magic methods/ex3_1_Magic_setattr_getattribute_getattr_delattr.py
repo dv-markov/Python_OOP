@@ -348,3 +348,120 @@ for mod in course.modules:
     print(mod.name)
     for lsn in mod.lessons:
         print(lsn.__dict__)
+
+
+# Task 6
+class Museum:
+    def __init__(self, name):
+        self.name = name
+        self.exhibits = []
+
+    def add_exhibit(self, obj):
+        self.exhibits.append(obj)
+
+    def remove_exhibit(self, obj):
+        self.exhibits.remove(obj)
+
+    def get_info_exhibit(self, indx):
+        return f"Описание экспоната {self.exhibits[indx].name}: {self.exhibits[indx].descr}"
+
+
+class Picture:
+    def __init__(self, name, author, descr):
+        self.name = name
+        self.author = author
+        self.descr = descr
+
+
+class Mummies:
+    def __init__(self, name, location, descr):
+        self.name = name
+        self.location = location
+        self.descr = descr
+
+
+class Papyri:
+    def __init__(self, name, date, descr):
+        self.name = name
+        self.date = date
+        self.descr = descr
+
+
+mus = Museum("Эрмитаж")
+mus.add_exhibit(Picture("Балакирев с подписчиками пишет письмо иноземному султану", "Неизвестный автор",
+                        "Вдохновляющая, устрашающая, волнующая картина"))
+mus.add_exhibit(Mummies("Балакирев", "Древняя Россия",
+                        "Просветитель XXI века, удостоенный мумификации"))
+p = Papyri("Ученья для, не злата ради", "Древняя Россия",
+           "Самое древнее найденное рукописное свидетельство о языках программирования")
+mus.add_exhibit(p)
+for x in mus.exhibits:
+    print(x.descr)
+for i in range(len(mus.exhibits)):
+    print(mus.get_info_exhibit(i))
+
+
+# Task 7
+class SmartPhone:
+    def __init__(self, model):
+        self.model = model
+        self.apps = []
+
+    def add_app(self, app):
+        for a in self.apps:
+            if a.__class__ == app.__class__:
+                break
+        else:
+            self.apps.append(app)
+        # if not any(filter(lambda x: type(x) == type(app), self.apps)):
+        #     self.apps.append(app)
+
+    def remove_app(self, app):
+        if app in self.apps:
+            self.apps.remove(app)
+
+
+class AppVK:
+    def __init__(self, name="ВКонтакте"):
+        self.name = name
+
+
+class AppYouTube:
+    def __init__(self, memory_max, name="YouTube"):
+        self.name = name
+        self.memory_max = memory_max
+
+
+class AppPhone:
+    def __init__(self, phone_list: dict, name="Phone"):
+        self.name = name
+        self.phone_list = phone_list
+
+
+app_1 = AppVK() # name = "ВКонтакте"
+app_2 = AppYouTube(1024) # name = "YouTube", memory_max = 1024
+app_3 = AppPhone({"Балакирев": 1234567890, "Сергей": 98450647365, "Работа": 112}) # name = "Phone", phone_list = словарь с контактами
+
+print(app_1.__dict__)
+print(app_2.__dict__)
+print(app_3.__dict__)
+
+sm = SmartPhone("Honor 1.0")
+sm.add_app(AppVK())
+sm.add_app(AppVK())  # второй раз добавляться не должно
+sm.add_app(AppYouTube(2048))
+for a in sm.apps:
+    print(a.name)
+
+
+# Variant 2
+#     def add_app(self, app):
+#         for i in self.apps:
+#             if type(app) == type(i):
+#                 app = None
+#         if app:
+#             self.apps.append(app)
+
+# Task 8
+
+
