@@ -462,6 +462,168 @@ for a in sm.apps:
 #         if app:
 #             self.apps.append(app)
 
+
 # Task 8
+class Circle:
+    def __init__(self, x, y, radius):
+        self.x = x
+        self.y = y
+        self.radius = radius
+
+    @property
+    def x(self):
+        return self.__x
+
+    @x.setter
+    def x(self, x):
+        self.__x = x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @y.setter
+    def y(self, y):
+        self.__y = y
+
+    @property
+    def radius(self):
+        return self.__radius
+
+    @radius.setter
+    def radius(self, radius):
+        self.__radius = radius
+
+    def __setattr__(self, key, value):
+        if type(value) not in (int, float):
+            raise TypeError("Неверный тип присваиваемых данных.")
+        if key == 'radius' and value > 0 or key != 'radius':
+            super().__setattr__(key, value)
+
+    def __getattr__(self, item):
+        return False
 
 
+c = Circle(2, 5, 10)
+print(c.__dict__)
+
+circle = Circle(10.5, 7, -22)
+circle.radius = -10 # прежнее значение не должно меняться, т.к. отрицательный радиус недопустим
+x, y = circle.x, circle.y
+res = circle.name # False, т.к. атрибут name не существует
+print(x, y, circle.radius, res)
+
+
+# Task 9
+class Dimensions:
+    MIN_DIMENSION = 10
+    MAX_DIMENSION = 1000
+
+    def __init__(self, a, b, c):
+        self.__a = self.__b = self.__c = None  # задание пустых свойств на случай ввода неверных данных
+        self.a = a
+        self.b = b
+        self.c = c
+
+    @property
+    def a(self):
+        return self.__a
+
+    @a.setter
+    def a(self, value):
+        self.__a = value
+
+    @property
+    def b(self):
+        return self.__b
+
+    @b.setter
+    def b(self, value):
+        self.__b = value
+
+    @property
+    def c(self):
+        return self.__c
+
+    @c.setter
+    def c(self, value):
+        self.__c = value
+
+    def __setattr__(self, key, value):
+        if key in ('MIN_DIMENSION', 'MAX_DIMENSION'):
+            raise AttributeError("Менять атрибуты MIN_DIMENSION и MAX_DIMENSION запрещено.")
+        if type(value) in (int, float) and self.MIN_DIMENSION <= value <= self.MAX_DIMENSION:
+            super().__setattr__(key, value)
+
+
+d = Dimensions(10.5, 20.1, 30)
+d.a = 8
+d.b = 15
+a, b, c = d.a, d.b, d.c  # a=10.5, b=15, c=30
+print(a, b, c)
+# d.MAX_DIMENSION = 10  # исключение AttributeError
+
+
+# Task 10
+import time
+
+
+class GeyserClassic:
+    MAX_DATE_FILTER = 100
+    filt_dict = {1: 'Mechanical', 2: 'Aragon', 3: 'Calcium'}
+
+    def __init__(self):
+        self.filters = [None]*3
+
+    def add_filter(self, slot_num, filt):
+        if self.filt_dict.get(slot_num) == type(filt).__name__ and self.filters[slot_num-1] is None:
+            self.filters[slot_num-1] = filt
+            print(f'Filter {filt} of type {type(filt).__name__} was installed to slot {slot_num}')
+
+    def remove_filter(self, slot_num):
+        self.filters[slot_num-1] = None
+
+    def get_filters(self):
+        return tuple(self.filters)
+
+    def water_on(self):
+        return all(self.filters) and all(map(lambda f: 0 <= time.time() - f.date <= self.MAX_DATE_FILTER, self.filters))
+
+
+class FiltClass:
+    f = True
+
+    def __init__(self, date):
+        self.date = date
+        self.f = False
+
+    def __setattr__(self, key, value):
+        if self.f:
+            super().__setattr__(key, value)
+
+
+class Mechanical(FiltClass):
+    pass
+
+
+class Aragon(FiltClass):
+    pass
+
+
+class Calcium(FiltClass):
+    pass
+
+
+my_water = GeyserClassic()
+my_water.add_filter(1, Mechanical(time.time()))
+my_water.add_filter(2, Aragon(time.time()))
+w = my_water.water_on()  # False
+print(w)
+my_water.add_filter(3, Calcium(time.time()))
+w = my_water.water_on()  # True
+print(w)
+f1, f2, f3 = my_water.get_filters()  # f1, f2, f3 - ссылки на соответствующие объекты классов фильтров
+print(f1, f2, f3)
+my_water.remove_filter(3)
+my_water.add_filter(3, Calcium(time.time()))  # повторное добавление в занятый слот невозможно
+my_water.add_filter(2, Calcium(time.time()))  # добавление в "чужой" слот также невозможно
