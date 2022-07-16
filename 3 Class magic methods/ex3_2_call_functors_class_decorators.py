@@ -113,3 +113,39 @@ print("""
 Задачи""")
 
 # Task 1
+from random import choices, randint
+
+
+# через класс-функтор
+class RandomPassword:
+    def __init__(self, psw_chars, min_length, max_length):
+        self.psw_chars = psw_chars
+        self.min_length = min_length
+        self.max_length = max_length
+
+    def __call__(self, *args, **kwargs):
+        return ''.join(choices(self.psw_chars, k=randint(self.min_length, self.max_length)))
+
+
+min_length = 5
+max_length = 20
+psw_chars = "qwertyuiopasdfghjklzxcvbnm0123456789!@#$%&*"
+rnd = RandomPassword(psw_chars, min_length, max_length)
+psw = rnd()
+print(psw)
+lst_pass = [rnd() for _ in range(3)]
+print(lst_pass)
+
+
+# через замыкание функции
+def random_password(psw_chars, min_length, max_length):
+    def randomizator3000():
+        return ''.join(choices(psw_chars, k=randint(min_length, max_length)))
+    return randomizator3000
+
+
+rnd1 = random_password(psw_chars, min_length, max_length)
+print(rnd1(), rnd1())
+lst_pass_closure = [rnd1() for _ in range(5)]
+print(lst_pass_closure)
+
