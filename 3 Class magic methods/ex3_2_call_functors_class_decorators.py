@@ -149,3 +149,123 @@ print(rnd1(), rnd1())
 lst_pass_closure = [rnd1() for _ in range(5)]
 print(lst_pass_closure)
 
+
+# Task 3
+class ImageFileAcceptor:
+    def __init__(self, extensions):
+        self.extensions = extensions
+
+    def __call__(self, file, *args, **kwargs):
+        # return file.split(".")[1] in self.extensions  # выдает ошибку, если файл не содержит точку
+        return file[file.find(".") + 1:] in self.extensions
+
+
+filenames = ["boat.jpg", "web.png", "text.txt", "python.doc", "ava.jpg", "forest.jpeg", "eq_1.png", "eq_2.png"]
+acceptor = ImageFileAcceptor(('jpg', 'bmp', 'jpeg'))
+image_filenames = filter(acceptor, filenames)
+print(list(image_filenames))  # ["boat.jpg", "ava.jpg", "forest.jpeg"]
+
+# Variant 2
+# метод endswith проверяет наличие заданной подстроки suffix(или кортежа подстрок) в конце передаваемой в него строки
+class ImageFileAcceptor:
+    def __init__(self, extensions):
+        self.extensions = extensions
+
+    def __call__(self, filename):
+        return filename.endswith(self.extensions)
+
+
+acceptor = ImageFileAcceptor(('jpg', 'bmp', 'jpeg'))
+image_filenames = filter(acceptor, filenames)
+print(list(image_filenames))  # ["boat.jpg", "ava.jpg", "forest.jpeg"]
+
+
+# Task 4
+from string import ascii_lowercase, digits
+
+
+class LoginForm:
+    def __init__(self, name, validators=None):
+        self.name = name
+        self.validators = validators
+        self.login = ""
+        self.password = ""
+
+    def post(self, request):
+        self.login = request.get('login', "")
+        self.password = request.get('password', "")
+
+    def is_validate(self):
+        if not self.validators:
+            return True
+
+        for v in self.validators:
+            if not v(self.login) or not v(self.password):
+                return False
+
+        return True
+
+
+# здесь прописывайте классы валидаторов: LengthValidator и CharsValidator
+class LengthValidator:
+    def __init__(self, min_length, max_length):
+        self.min_length = min_length
+        self.max_length = max_length
+
+    def __call__(self, input_string, *args, **kwargs):
+        return self.min_length <= len(input_string) <= self.max_length
+
+
+class CharsValidator:
+    def __init__(self, chars):
+        self.chars = chars
+
+    def __call__(self, input_string, *args, **kwargs):
+        return set(input_string).issubset(self.chars)
+
+
+lv = LengthValidator(0, 500)  # min_length - минимально допустимая длина; max_length - максимально допустимая длина
+cv = CharsValidator(ascii_lowercase+digits)  # chars - строка из допустимых символов
+
+string = 'Hello123321Python'
+res1 = lv(string)
+res2 = cv(string)
+print(res1, res2)
+
+lg = LoginForm("Вход на сайт", validators=[LengthValidator(3, 50), CharsValidator(ascii_lowercase + digits)])
+lg.post({"login": "root", "password": "panda"})
+if lg.is_validate():
+    print("Дальнейшая обработка данных формы")
+
+
+# Task 5
+class DigitRetrieve:
+    def __call__(self, digit, *args, **kwargs):
+        try:
+            return int(digit)
+        except ValueError:
+            return
+
+
+dg = DigitRetrieve()
+d1 = dg("123")   # 123 (целое число)
+d2 = dg("45.54")   # None (не целое число)
+d3 = dg("-56")   # -56 (целое число)
+d4 = dg("12fg")  # None (не целое число)
+d5 = dg("abc")   # None (не целое число)
+print(d1, d2, d3, d4, d5, sep='\n')
+
+
+# Task 6
+class RenderList:
+    def __init__(self, type_list='ul'):
+        self.tl = type_list if type_list == 'ol' else 'ul'
+
+    def __call__(self, lst, *args, **kwargs):
+        return f'<{self.tl}>\n<li>' + '</li>\n<li>'.join(lst) + f'</li>\n</{self.tl}>'
+
+
+lst = ["Пункт меню 1", "Пункт меню 2", "Пункт меню 3"]
+render = RenderList("ol")
+html = render(lst)
+print(html)
