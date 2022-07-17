@@ -269,3 +269,34 @@ lst = ["Пункт меню 1", "Пункт меню 2", "Пункт меню 3"
 render = RenderList("ol")
 html = render(lst)
 print(html)
+
+# Variant 2
+# def __call__(self, lst: list):
+#     return f'<{self.type_list}>\n' + '\n'.join([f'<li>{i}</li>' for i in lst]) + f'\n</{self.type_list}>'
+
+# Variant 3
+# def __call__(self, lst, *args, **kwargs):
+#     ml = map(lambda x: f'<li>{x}</li>\n', lst)
+#     return f'<{self.type_list}>\n' + ''.join(ml) + f'</{self.type_list}>'
+
+
+# Task 7
+class HandlerGET:
+    def __init__(self, func):
+        self.__fn = func
+
+    def __call__(self, req, *args, **kwargs):
+        return self.get(self.__fn, req)
+
+    def get(self, func, req, *args, **kwargs):
+        output = 'GET: ' + func(req)
+        return output if req.get('method', 'GET') == 'GET' else None
+
+
+@HandlerGET
+def contact(request):
+    return "Сергей Балакирев"
+
+
+res = contact({"method": "GET", "url": "contact.html"})
+print(res)
