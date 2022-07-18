@@ -300,3 +300,62 @@ def contact(request):
 
 res = contact({"method": "GET", "url": "contact.html"})
 print(res)
+print()
+
+
+# Variant 2
+# class HandlerGET:
+#     def __init__(self, func):
+#         self.__fn = func
+#
+#     def __call__(self, request, *args, **kwargs):
+#         m = request.get('method', 'GET')
+#         if m == 'GET':
+#             return self.get(self.__fn, request)
+#         return None
+#
+#     def get(self, func, request, *args, **kwargs):
+#         return f'GET: {func(request)}'
+
+
+# Task 8
+class Handler:
+    def __init__(self, methods=('GET',)):
+        self.__methods = methods
+
+    def __call__(self, func):
+        def wrapper(request, *args, **kwargs):
+            m = request.get('method', 'GET')
+            if m in self.__methods:
+                return self.__getattribute__(m.lower())(func, request)
+
+        return wrapper
+
+    def get(self, func, request, *args, **kwargs):
+        return f'GET: {func(request)}'
+
+    def post(self, func, request, *args, **kwargs):
+        return f'POST: {func(request)}'
+
+
+@Handler(methods=('GET', 'POST'))
+def contact(request):
+    return "Сергей Балакирев"
+
+
+res = contact({"method": "POST", "url": "contact.html"})
+print(res)
+
+
+# Variant 0
+# def __call__(self, func):
+#     def wrapper(request, *args, **kwargs):
+#         m = request.get('method', 'GET')
+#         if m not in self.__methods:
+#             return None
+#         if m == 'GET':
+#             return self.get(func, request)
+#         if m == 'POST':
+#             return self.post(func, request)
+#
+#     return wrapper
