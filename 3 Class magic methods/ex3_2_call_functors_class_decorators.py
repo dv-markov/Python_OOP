@@ -359,3 +359,49 @@ print(res)
 #             return self.post(func, request)
 #
 #     return wrapper
+
+
+# Task 9
+# class InputDigits:
+#     def __init__(self, func):
+#         self.__func = func
+#
+#     def __call__(self, *args, **kwargs):
+#         return list(map(int, self.__func().split()))
+#
+#
+# input_dg = InputDigits(input)
+# res = input_dg()
+# print(res)
+
+
+# Task 10
+# class RenderDigit:
+#     def __call__(self, dig, *args, **kwargs):
+#         try:
+#             return int(dig)
+#         except ValueError:
+#             return None
+#
+#
+# class InputValues:
+#     def __init__(self, render):
+#         self.render = render
+#
+#     def __call__(self, func):
+#         def wrapper(*args, **kwargs):
+#             return list(map(self.render, func().split()))
+#         return wrapper
+#
+#
+# input_dg = InputValues(RenderDigit())(input)
+# res = input_dg()
+# print(res)
+#
+# render = RenderDigit()
+# d1 = render("123")   # 123 (целое число)
+# d2 = render("45.54")   # None (не целое число)
+# d3 = render("-56")   # -56 (целое число)
+# d4 = render("12fg")  # None (не целое число)
+# d5 = render("abc")   # None (не целое число)
+# print(d1, d2, d3, d4, d5)
