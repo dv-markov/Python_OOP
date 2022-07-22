@@ -170,12 +170,9 @@ class LinkedList:
     def __walk_list(self, indx=math.inf):
         i = 0
         obj = self.head
-        if obj:
-            while i < indx and obj.next:
-                obj = obj.next
-                i += 1
-            if indx != math.inf and i != indx:
-                raise AttributeError('Index out of range')
+        while obj and i < indx:
+            obj = obj.next
+            i += 1
         return i, obj
 
     def add_obj(self, obj):
@@ -187,7 +184,7 @@ class LinkedList:
         self.tail = obj
 
     def remove_obj(self, indx):
-        i, obj = self.__walk_list(indx)
+        obj = self.__walk_list(indx)[1]
         if not obj:
             return
         if obj.prev:
@@ -200,8 +197,7 @@ class LinkedList:
             self.tail = obj.prev
 
     def __len__(self):
-        i, obj = self.__walk_list()
-        return i + 1 if obj else i
+        return self.__walk_list()[0]
 
     def __call__(self, indx, *args, **kwargs):
         obj = self.__walk_list(indx)[1]
@@ -225,11 +221,22 @@ linked_lst.add_obj(ObjList("Python ООП"))
 print(linked_lst.get_data())
 
 n = len(linked_lst)  # n = 3
-s = linked_lst(1) # s = Balakirev
+s = linked_lst(2) # s = Balakirev
 print(n, s)
 
 l1 = LinkedList()
 print(len(l1))
 l1.remove_obj(0)
-l1(0)
+print(l1(2))
 
+# Variant 0
+# def __walk_list(self, indx=math.inf):
+#     i = 0
+#     obj = self.head
+#     if obj:
+#         while i < indx and obj.next:
+#             obj = obj.next
+#             i += 1
+#         if indx != math.inf and i != indx:
+#             raise AttributeError('Index out of range')
+#     return i, obj
