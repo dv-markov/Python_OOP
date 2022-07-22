@@ -2,6 +2,9 @@
 
 
 # Методы __str__ и __repr__
+import math
+
+
 class Cat:
     def __init__(self, name):
         self.name = name
@@ -41,7 +44,7 @@ print("""
 Задачи""")
 
 
-# Task 1
+# Task 2
 class Book:
     def __init__(self, title, author, pages):
         self.title = title
@@ -53,10 +56,180 @@ class Book:
 
 
 import sys
-lst_in = list(map(str.strip, sys.stdin.readlines()))
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+lst_in = ['Python ООП', 'Балакирев С.М.', '1024']
 book = Book(*lst_in)
 print(book)
 
 
+# Task 3
+class Model:
+    def __init__(self):
+        self.fields = {}
 
+    def query(self, **kwargs):
+        self.fields.update(kwargs)
+
+    def __str__(self):
+        lst = [f"{key} = {value}" for key, value in self.fields.items()]
+        return "Model: " + ", ".join(lst) if self.fields else "Model"
+
+
+model = Model()
+model.query(id=1, fio='Sergey', old=33)
+model.query(id=2)
+print(model.__dict__)
+print(model)
+
+
+# Task 4
+class WordString:
+    def __init__(self, string=None):
+        self.string = string
+
+    @property
+    def string(self):
+        return self.__string
+
+    @string.setter
+    def string(self, s):
+        self.__string = s
+
+    def __len__(self):
+        return len(self.string.split())
+
+    def __call__(self, indx, *args, **kwargs):
+        return self.string.split()[indx]
+
+
+words = WordString()
+words.string = "Курс по Python ООП"
+n = len(words)
+first = "" if n == 0 else words(0)
+print(words.string)
+print(f"Число слов: {n}; первое слово: {first}")
+
+words.string = "Курс по Python    ООП от  Сергея Балакирева"
+print(words.__dict__)
+
+
+# Task 5
+# class ObjListValue:
+#     def __set_name__(self, owner, name):
+#         self.name = "__" + name
+#
+#     def __get__(self, instance, owner):
+#         return getattr(instance, self.name)
+#
+#     def __set__(self, instance, value):
+#         setattr(instance, self.name, value)
+#
+#
+# class ObjList:
+#     prev = ObjListValue()
+#     next = ObjListValue()
+#     data = ObjListValue()
+#
+#     pass
+
+
+class ObjList:
+    def __init__(self, data=None):
+        self.prev = self.next = None
+        self.data = data
+
+    @property
+    def prev(self):
+        return self.__prev
+
+    @prev.setter
+    def prev(self, prv):
+        self.__prev = prv if isinstance(prv, self.__class__) else None
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, nxt):
+        self.__next = nxt if isinstance(nxt, self.__class__) else None
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.__data = data
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = self.tail = None
+
+    def __walk_list(self, indx=math.inf):
+        i = 0
+        obj = self.head
+        if obj:
+            while i < indx and obj.next:
+                obj = obj.next
+                i += 1
+            if indx != math.inf and i != indx:
+                raise AttributeError('Index out of range')
+        return i, obj
+
+    def add_obj(self, obj):
+        if not self.head:
+            self.head = obj
+        if self.tail:
+            self.tail.next = obj
+            obj.prev = self.tail
+        self.tail = obj
+
+    def remove_obj(self, indx):
+        i, obj = self.__walk_list(indx)
+        if not obj:
+            return
+        if obj.prev:
+            obj.prev.next = obj.next
+        else:
+            self.head = obj.next
+        if obj.next:
+            obj.next.prev = obj.prev
+        else:
+            self.tail = obj.prev
+
+    def __len__(self):
+        i, obj = self.__walk_list()
+        return i + 1 if obj else i
+
+    def __call__(self, indx, *args, **kwargs):
+        obj = self.__walk_list(indx)[1]
+        return obj.data if obj else None
+
+    def get_data(self):
+        obj = self.head
+        res_lst = []
+        while obj:
+            res_lst.append(obj.data)
+            obj = obj.next
+        return res_lst or None
+
+
+linked_lst = LinkedList()
+linked_lst.add_obj(ObjList("Sergey"))
+linked_lst.add_obj(ObjList("Balakirev"))
+linked_lst.add_obj(ObjList("Python"))
+linked_lst.remove_obj(2)
+linked_lst.add_obj(ObjList("Python ООП"))
+print(linked_lst.get_data())
+
+n = len(linked_lst)  # n = 3
+s = linked_lst(1) # s = Balakirev
+print(n, s)
+
+l1 = LinkedList()
+print(len(l1))
+l1.remove_obj(0)
+l1(0)
 
