@@ -280,3 +280,45 @@ cmp.img = 4
 c_abs = abs(cmp)
 
 print(c_abs)
+
+
+# Task 7
+class RadiusVector:
+    def __init__(self, *args):
+        if len(args) == 1 and type(args[0]) == int and args[0] > 1:
+            self.coords = [0] * args[0]
+        else:
+            self.coords = [x for x in args if self.check_coord(x)]
+
+    @staticmethod
+    def check_coord(value):
+        return type(value) in (int, float)
+
+    def set_coords(self, *args):
+        args = list(filter(self.check_coord, args))
+        for i in range(min(len(self.coords), len(args))):
+            self.coords[i] = args[i]
+
+    def get_coords(self):
+        return tuple(self.coords)
+
+    def __len__(self):
+        return len(self.coords)
+
+    def __abs__(self):
+        return sum(x**2 for x in self.coords)**0.5
+
+
+r = RadiusVector()
+print(r.__dict__)
+vector3D = RadiusVector(3)
+vector3D.set_coords(3, -5.6, 8)
+a, b, c = vector3D.get_coords()
+print(a, b, c)
+vector3D.set_coords(3, -5.6, 8, 10, 11)  # ошибки быть не должно, последние две координаты игнорируются
+print(vector3D.__dict__)
+vector3D.set_coords(1, 2)  # ошибки быть не должно, меняются только первые две координаты
+print(vector3D.__dict__)
+res_len = len(vector3D) # res_len = 3
+res_abs = abs(vector3D)
+print(res_len, res_abs)
