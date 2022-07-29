@@ -322,3 +322,121 @@ print(vector3D.__dict__)
 res_len = len(vector3D) # res_len = 3
 res_abs = abs(vector3D)
 print(res_len, res_abs)
+
+
+# Task 8
+class Clock:
+    def __init__(self, hours, minutes, seconds):
+        self.hr = hours
+        self.mn = minutes
+        self.sec = seconds
+
+    def get_time(self):
+        return self.hr * 3600 + self.mn * 60 + self.sec
+
+
+class DeltaClock:
+    def __init__(self, clock1, clock2):
+        self.clock1 = clock1
+        self.clock2 = clock2
+
+    def __str__(self):
+        time_diff = len(self)
+        hr = time_diff // 3600
+        mn = time_diff % 3600 // 60
+        sec = time_diff % 3600 % 60
+        return f'{hr:02}: {mn:02}: {sec:02}'
+
+    def __len__(self):
+        res = self.clock1.get_time() - self.clock2.get_time()
+        return res if res > 0 else 0
+
+
+dt = DeltaClock(Clock(2, 45, 0), Clock(1, 15, 0))
+print(dt) # 01: 30: 00
+len_dt = len(dt) # 5400
+print(len_dt)
+
+dt1 = DeltaClock(Clock(0, 45, 0), Clock(1, 15, 0))
+print(dt1) # 01: 30: 00
+len_dt1 = len(dt1) # 5400
+print(len_dt1)
+
+# Variant 0
+# class DeltaClock:
+#     def __init__(self, clock1, clock2):
+#         self.clock1 = clock1
+#         self.clock2 = clock2
+#
+#     def __str__(self):
+#         cl1, cl2 = self.clock1, self.clock2
+#         return f'{self.subtr(cl1.hr, cl2.hr):02}: {self.subtr(cl1.mn, cl2.mn):02}: {self.subtr(cl1.sec, cl2.sec):02}'
+#
+#     def __len__(self):
+#         return self.subtr(self.clock1.get_time(), self.clock2.get_time())
+#
+#     @staticmethod
+#     def subtr(value1, value2):
+#         res = value1 - value2
+#         return res if res > 0 else 0
+
+
+# Task 9
+class Ingredient:
+    def __init__(self, name, volume, measure):
+        self.name = name
+        self.volume = volume
+        self.measure = measure
+
+    def __str__(self):
+        return f'{self.name}: {self.volume}, {self.measure}'
+
+
+class Recipe:
+    def __init__(self, *args):
+        self._ing_list = list(args)
+
+    def add_ingredient(self, ing):
+        self._ing_list.append(ing)
+
+    def remove_ingredient(self, ing):
+        self._ing_list.remove(ing)
+
+    def get_ingredients(self):
+        return tuple(self._ing_list)
+
+    def __len__(self):
+        return len(self._ing_list)
+
+
+recipe = Recipe()
+recipe.add_ingredient(Ingredient("Соль", 1, "столовая ложка"))
+recipe.add_ingredient(Ingredient("Мука", 1, "кг"))
+recipe.add_ingredient(Ingredient("Мясо баранины", 10, "кг"))
+ings = recipe.get_ingredients()
+n = len(recipe) # n = 3
+print(ings)
+print(n)
+
+
+# Task 10
+class PolyLine:
+    def __init__(self, *args):
+        self.__coords = list(args)
+
+    def add_coord(self, x, y):
+        self.__coords.append((x, y),)
+
+    def remove_coord(self, indx):
+        self.__coords.pop(indx)
+
+    def get_coords(self):
+        return self.__coords
+
+
+poly = PolyLine((1, 2), (3, 5), (0, 10), (-1, 8))
+print(poly.__dict__)
+poly.add_coord(10, 20)
+poly.remove_coord(0)
+print(poly.get_coords())
+
