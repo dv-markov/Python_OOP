@@ -10,6 +10,7 @@ class Cat:
         self.name = name
 
     # метод __repr__ предназначен для вывода информации в режиме отладки
+    # # также вызывается при обращении к объекту, как к элементу списка в другом объекте
     def __repr__(self):
         return f"{self.__class__}: {self.name}"
 
@@ -439,4 +440,3 @@ print(poly.__dict__)
 poly.add_coord(10, 20)
 poly.remove_coord(0)
 print(poly.get_coords())
-

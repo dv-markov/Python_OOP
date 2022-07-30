@@ -401,6 +401,47 @@ for i in range(len(mus.exhibits)):
     print(mus.get_info_exhibit(i))
 
 
+# Variant 2 - с наследованием классов
+# class Museum:
+#     def __init__(self, name):
+#         self.name = name
+#         self.exhibits = []
+#
+#     def add_exhibit(self, obj):
+#         self.exhibits.append(obj)
+#
+#     def remove_exhibit(self, obj):
+#         self.exhibits.remove(obj)
+#
+#     def get_info_exhibit(self, indx):
+#         obj = self.exhibits[indx]
+#         return f"Описание экспоната {obj.name}: {obj.descr}"
+#
+#
+# class Exhibit:
+#     def __init__(self, name, descr):
+#         self.name = name
+#         self.descr = descr
+#
+#
+# class Picture(Exhibit):
+#     def __init__(self, name, author, descr):
+#         super().__init__(name, descr)
+#         self.author = author
+#
+#
+# class Mummies(Exhibit):
+#     def __init__(self, name, location, descr):
+#         super().__init__(name, descr)
+#         self.location = location
+#
+#
+# class Papyri(Exhibit):
+#     def __init__(self, name, date, descr):
+#         super().__init__(name, descr)
+#         self.date = date
+
+
 # Task 7
 class SmartPhone:
     def __init__(self, model):
