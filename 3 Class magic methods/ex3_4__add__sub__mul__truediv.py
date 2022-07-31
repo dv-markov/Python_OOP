@@ -1,6 +1,9 @@
 # 3.4 Методы __add__, __sub__, __mul__, __truediv__
 
 # сложение объекта с числом
+from operator import add, sub, mul, truediv
+
+
 class Clock:
     __DAY = 86400  # число секунд в одном дне
 
@@ -134,11 +137,12 @@ class NewList:
     def __check_list(list_n):
         if not isinstance(list_n, (list, NewList)):
             raise ArithmeticError("Правый операнд должен быть list или NewList")
-        return list_n.get_list() if isinstance(list_n, NewList) else list_n
+        if isinstance(list_n, NewList):
+            return list_n.get_list()
+        return list_n
 
     @staticmethod
     def __subtract_lists(lst1, lst2):
-        # return [x for x in lst1 if all(map(lambda y: x is not y, lst2))]
         lst2_tmp = lst2[:]
         res = []
         for i in range(len(lst1)):
@@ -178,5 +182,331 @@ print(res_4.get_list())
 
 print(a.get_list())
 
-# Variant 2
+# Variant 2 - без учета повторов и True / False == 1 /0
 # return NewList(list(filter(lambda x: x not in lst_sub, self.lst)))
+
+# Variant 3 - у учетом bool != int, но без учета повторов
+# return [x for x in lst1 if all(map(lambda y: x is not y, lst2))]
+
+# Variant 3 - Balakirev
+# @staticmethod
+# def __diff_list(lst_1, lst_2):
+#     if len(lst_2) == 0:
+#         return lst_2
+#     sub = lst_2[:]
+#     return [x for x in lst_1 if not self.__is_elem(x, sub)]
+#
+# @staticmethod
+# def __is_elem(x, sub):
+#     res = any(map(lambda xx: type(x) == type(xx) and x == xx, sub))
+#     if res:
+#         sub.remove(x)
+#     return res
+
+
+# Task 5
+class ListMath:
+    def __init__(self, lst_math=None):
+        self.lst_math = list(filter(lambda x: type(x) in (int, float), lst_math)) if lst_math else []
+
+    @staticmethod
+    def __operate(value1, value2, operator_fn):
+        if type(value1) in (int, float):
+            return [operator_fn(value1, x) for x in value2]
+        elif type(value2) in (int, float):
+            return [operator_fn(x, value2) for x in value1]
+        else:
+            raise ArithmeticError("Операнд должен быть целым или вещественным числом")
+
+    def __add__(self, other):
+        return ListMath(self.__operate(self.lst_math, other, add))
+
+    def __radd__(self, other):
+        return self + other
+
+    def __iadd__(self, other):
+        self.lst_math = self.__operate(self.lst_math, other, add)
+        return self
+
+    def __sub__(self, other):
+        return ListMath(self.__operate(self.lst_math, other, sub))
+
+    def __rsub__(self, other):
+        return ListMath(self.__operate(other, self.lst_math, sub))
+
+    def __isub__(self, other):
+        self.lst_math = self.__operate(self.lst_math, other, sub)
+        return self
+
+    def __mul__(self, other):
+        return ListMath(self.__operate(self.lst_math, other, mul))
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __imul__(self, other):
+        self.lst_math = self.__operate(self.lst_math, other, mul)
+        return self
+
+    def __truediv__(self, other):
+        return ListMath(self.__operate(self.lst_math, other, truediv))
+
+    def __rtruediv__(self, other):
+        return ListMath(self.__operate(other, self.lst_math, truediv))
+
+    def __itruediv__(self, other):
+        self.lst_math = self.__operate(self.lst_math, other, truediv)
+        return self
+
+
+lst = ListMath([1, "abc", -5, 7.68, True])
+print(lst.__dict__)
+
+lst = lst + 76 # сложение каждого числа списка с определенным числом
+print(lst.lst_math)
+lst = 6.5 + lst # сложение каждого числа списка с определенным числом
+print(lst.lst_math)
+lst += 76.7  # сложение каждого числа списка с определенным числом
+print(lst.lst_math)
+lst = lst - 76 # вычитание из каждого числа списка определенного числа
+print(lst.lst_math)
+lst = 7.0 - lst # вычитание из числа каждого числа списка
+print(lst.lst_math)
+lst -= 76.3
+print(lst.lst_math)
+
+lst = lst * 5 # умножение каждого числа списка на указанное число (в данном случае на 5)
+print(lst.lst_math)
+lst = 5 * lst # умножение каждого числа списка на указанное число (в данном случае на 5)
+print(lst.lst_math)
+lst *= 5.54
+print(lst.lst_math)
+lst = lst / 13 # деление каждого числа списка на указанное число (в данном случае на 13)
+print(lst.lst_math)
+lst = 3 / lst # деление числа на каждый элемент списка
+print(lst.lst_math)
+lst /= 13.0
+print(lst.lst_math)
+
+
+# Variant 2 - можно вызывать магические методы от любых объектов, в т. ч. чисел
+# class ListMath:
+#     def __init__(self, arg=[]):
+#         self.lst_math = [i for i in arg if type(i) in (int, float)]
+#
+#     def do(self, fn_name, other, new=True):
+#         result = [getattr(i, fn_name)(other) for i in self.lst_math]
+#         if new:
+#             return ListMath(result)
+#         else:
+#             self.lst_math = result
+#             return self
+#
+#     def __add__(self, other):
+#         return self.do('__add__', other)
+#
+#     def __sub__(self, other):
+#         return self.do('__sub__', other)
+#
+#     def __rsub__(self, other):
+#         return self.do('__rsub__', other)
+#
+#     def __mul__(self, other):
+#         return self.do('__mul__', other)
+#
+#     def __rmul__(self, other):
+#         return self.do('__rmul__', other)
+#
+#     def __truediv__(self, other):
+#         return self.do('__truediv__', other)
+#
+#     def __iadd__(self, other):
+#         return self.do('__add__', other, False)
+#
+#     def __isub__(self, other):
+#         return self.do('__sub__', other, False)
+#
+#     def __imul__(self, other):
+#         return self.do('__mul__', other, False)
+#
+#     def __idiv__(self, other):
+#         return self.do('__truediv__', other, False)
+
+
+# Task 6
+class StackObj:
+    def __init__(self, data: str):
+        self.__data = data
+        self.__next = None
+
+    def set_next(self, obj):
+        self.__next = obj
+
+    def get_next(self):
+        return self.__next
+
+    def get_data(self):
+        return self.__data
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+
+    def push_back(self, obj):
+        if self.top:
+            tmp = self.top
+            while tmp.get_next():
+                tmp = tmp.get_next()
+            tmp.set_next(obj)
+        else:
+            self.top = obj
+
+    def pop_back(self):
+        if self.top:
+            if self.top.get_next() is None:
+                tmp = self.top
+                self.top = None
+                return tmp.get_data()
+            else:
+                tmp1 = self.top
+                tmp2 = self.top.get_next()
+                while tmp2.get_next():
+                    tmp1 = tmp2
+                    tmp2 = tmp2.get_next()
+                tmp1.set_next(None)
+                return tmp2.get_data()
+
+    def __add__(self, other):
+        self.push_back(other)
+        return self
+
+    def __mul__(self, other):
+        for d in other:
+            self.push_back(StackObj(d))
+        return self
+
+    def get_stack_items(self):
+        tmp = self.top
+        res = []
+        while tmp:
+            res.append(tmp.get_data())
+            tmp = tmp.get_next()
+        return res
+
+assert hasattr(Stack, 'pop_back'), "класс Stack должен иметь метод pop_back"
+st = Stack()
+print(st.get_stack_items())
+top = StackObj("1")
+st.push_back(top)
+print(st.get_stack_items())
+assert st.top == top, "неверное значение атрибута top"
+
+st = st + StackObj("2")
+st = st + StackObj("3")
+obj = StackObj("4")
+st += obj
+print(st.get_stack_items())
+
+st = st * ['data_1', 'data_2']
+st *= ['data_3', 'data_4']
+print(st.get_stack_items())
+
+d = ["1", "2", "3", "4", 'data_1', 'data_2', 'data_3', 'data_4']
+h = top
+i = 0
+while h:
+    assert h._StackObj__data == d[i], "неверное значение атрибута __data, возможно, " \
+                                      "некорректно работают операторы + и *"
+    h = h._StackObj__next
+    i += 1
+
+assert i == len(d), "неверное число объектов в стеке"
+
+print(st.pop_back())
+print(st.pop_back())
+print(st.get_stack_items())
+
+
+# Variant 2 - refactored
+class StackObj:
+    def __init__(self, data: str):
+        self.__data = data
+        self.__next = None
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, obj):
+        self.__next = obj
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+
+    def push_back(self, obj):
+        if self.top:
+            tmp = self.top
+            while tmp.next:
+                tmp = tmp.next
+            tmp.next = obj
+        else:
+            self.top = obj
+
+    def pop_back(self):
+        if self.top:
+            if self.top.next:
+                tmp = self.top
+                while tmp.next.next:
+                    tmp = tmp.next
+                tmp.next = None
+            else:
+                self.top = None
+
+    def __add__(self, other):
+        self.push_back(other)
+        return self
+
+    def __mul__(self, other):
+        for d in other:
+            self.push_back(StackObj(d))
+        return self
+
+    def get_stack_items(self):
+        tmp = self.top
+        res = []
+        while tmp:
+            res.append(tmp._StackObj__data)
+            tmp = tmp.next
+        return res
+
+
+assert hasattr(Stack, 'pop_back'), "класс Stack должен иметь метод pop_back"
+st = Stack()
+top = StackObj("1")
+st.push_back(top)
+assert st.top == top, "неверное значение атрибута top"
+st = st + StackObj("2")
+st = st + StackObj("3")
+obj = StackObj("4")
+st += obj
+st = st * ['data_1', 'data_2']
+st *= ['data_3', 'data_4']
+d = ["1", "2", "3", "4", 'data_1', 'data_2', 'data_3', 'data_4']
+h = top
+i = 0
+while h:
+    assert h._StackObj__data == d[i], "неверное значение атрибута __data, возможно, " \
+                                      "некорректно работают операторы + и *"
+    h = h._StackObj__next
+    i += 1
+
+assert i == len(d), "неверное число объектов в стеке"
+st.pop_back()
+st.pop_back()
+print(st.get_stack_items())
+
+
