@@ -289,7 +289,7 @@ lst /= 13.0
 print(lst.lst_math)
 
 
-# Variant 2 - можно вызывать магические методы от любых объектов, в т. ч. чисел
+# Variant 2 - можно вызывать магические методы арифметических операций для любых объектов, в т. ч. для чисел
 # class ListMath:
 #     def __init__(self, arg=[]):
 #         self.lst_math = [i for i in arg if type(i) in (int, float)]
@@ -614,4 +614,184 @@ for x in my_budget.get_items():
 print(s)
 
 
+# Task 9
+class Box3D:
+    def __init__(self, width, height, depth):
+        self.width = width
+        self.height = height
+        self.depth = depth
 
+    def __add__(self, other):
+        if isinstance(other, Box3D):
+            return Box3D(*map(sum, zip(self.get_coords(), other.get_coords())))
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Box3D(*map(other.__mul__, self.get_coords()))
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __sub__(self, other):
+        if isinstance(other, Box3D):
+            return Box3D(*map(lambda x: x[0] - x[1], zip(self.get_coords(), other.get_coords())))
+
+    def __floordiv__(self, other):
+        if isinstance(other, int):
+            return Box3D(*map(lambda x: x // other, self.get_coords()))
+
+    def __mod__(self, other):
+        if isinstance(other, int):
+            return Box3D(*map(lambda x: x % other, self.get_coords()))
+
+    def get_coords(self):
+        return self.width, self.height, self.depth
+
+
+box1 = Box3D(1, 2, 3)
+box2 = Box3D(2, 4, 6)
+box = box1 + box2  # Box3D: width=3, height=6, depth=9 (соответствующие размерности складываются)
+print(box.__dict__)
+box = box1 * 2    # Box3D: width=2, height=4, depth=6 (каждая размерность умножается на 2)
+print(box.__dict__)
+box = 3 * box2    # Box3D: width=6, height=12, depth=18
+print(box.__dict__)
+box = box2 - box1 # Box3D: width=1, height=2, depth=3 (соответствующие размерности вычитаются)
+print(box.__dict__)
+box = box1 // 2   # Box3D: width=0, height=1, depth=1 (соответствующие размерности целочисленно делятся на 2)
+print(box.__dict__)
+box = box2 % 3    # Box3D: width=2, height=1, depth=0
+print(box.__dict__)
+
+# Variant 2
+# class Box3D:
+#     def __init__(self, width, height, depth):
+#         self.width = width
+#         self.height = height
+#         self.depth = depth
+#
+#     def get_attrs(self):
+#         return self.width, self.height, self.depth
+#
+#     def __add__(self, other):
+#         return Box3D(*map(sum, zip(self.get_attrs(), other.get_attrs())))
+#
+#     def __mul__(self, other):
+#         return Box3D(*[i * other for i in self.get_attrs()])
+#
+#     def __rmul__(self, other):
+#         return self * other
+#
+#     def __sub__(self, other):
+#         return self + other * (-1)
+#
+#     def __floordiv__(self, other):
+#         return Box3D(*[i // other for i in self.get_attrs()])
+#
+#     def __mod__(self, other):
+#         return Box3D(*[i % other for i in self.get_attrs()])
+
+# Variant 3
+# from operator import add, sub, mul, mod, floordiv
+#
+# class Box3D:
+#     def __init__(self, width, height, depth):
+#         self.width = width
+#         self.height = height
+#         self.depth = depth
+#
+#     def __make_calc(self, other, op):
+#         data = self.width, self.height, self.depth
+#         if isinstance(other, Box3D):
+#             data2 = other.width, other.height, other.depth
+#             return (op(s, o) for s, o in zip(data, data2))
+#         elif type(other) in (int, float):
+#             return (op(b, other) for b in data)
+#         return 0, 0, 0
+#
+#     def __add__(self, other):
+#         return Box3D(*self.__make_calc(other, add))
+#
+#     def __radd__(self, other):
+#         return self.__add__(other)
+#
+#     def __sub__(self, other):
+#         return Box3D(*self.__make_calc(other, sub))
+#
+#     def __mul__(self, num):
+#         return Box3D(*self.__make_calc(num, mul))
+#
+#     def __rmul__(self, num):
+#         return self.__mul__(num)
+#
+#     def __mod__(self, num):
+#         return Box3D(*self.__make_calc(num, mod))
+#
+#     def __floordiv__(self, num):
+#         return Box3D(*self.__make_calc(num, floordiv))
+
+# Variant 4
+# class Box3D:
+#     def __init__(self, width, height, depth):
+#         self.width = width
+#         self.height = height
+#         self.depth = depth
+#
+#     def do(self, fname, oth):
+#         return Box3D(*([getattr(self.__dict__[i], fname)(oth.__dict__[i]
+#                                                          if type(oth) is Box3D else oth)
+#                         for i in self.__dict__]))
+#
+#     def __add__(self, other):
+#         return self.do('__add__', other)
+#
+#     def __mul__(self, other):
+#         return self.do('__mul__', other)
+#
+#     def __rmul__(self, other):
+#         return self.do('__rmul__', other)
+#
+#     def __sub__(self, other):
+#         return self.do('__sub__', other)
+#
+#     def __floordiv__(self, other):
+#         return self.do('__floordiv__', other)
+#
+#     def __mod__(self, other):
+#         return self.do('__mod__', other)
+
+
+# Task 10
+class MaxPooling:
+    def __init__(self, step=(2, 2), size=(2, 2)):
+        self.step = step
+        self.size = size
+
+    def __call__(self, matrix, *args, **kwargs):
+        len_v, len_h = len(matrix), len(matrix[0])
+        if type(matrix) != list or \
+                any(len(row) != len_h for row in matrix) or\
+                any(type(x) not in (int, float) for row in matrix for x in row):
+            raise ValueError("Неверный формат для первого параметра matrix.")
+        res = []
+        i = 0
+        while i + self.size[0] <= len_v:
+            res.append([])
+            j = 0
+            while j + self.size[1] <= len_h:
+                res[len(res)-1].append(self.get_max(matrix, i, j))
+                j += self.step[1]
+            i += self.step[0]
+        return res
+
+    def get_max(self, mtx, i, j):
+        return max(max(row[j:j+self.size[1]]) for row in mtx[i:i+self.size[0]])
+
+
+mtrx = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 8, 7, 6], [5, 4, 3, 2]]
+mp = MaxPooling()
+print(mp(mtrx))
+mp = MaxPooling(step=(1, 1), size=(3, 3))
+print(mp(mtrx))
+mp = MaxPooling(step=(2, 2), size=(1, 1))
+print(mp(mtrx))
