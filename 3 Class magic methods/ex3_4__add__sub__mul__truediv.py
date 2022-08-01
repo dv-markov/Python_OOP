@@ -510,3 +510,108 @@ st.pop_back()
 print(st.get_stack_items())
 
 
+# Task 7
+class Book:
+    def __init__(self, title: str, author: str, year: int):
+        self.title = title
+        self.author = author
+        self.year = year
+
+
+class Lib:
+    def __init__(self):
+        self.book_list = []
+
+    def __add__(self, other):
+        if isinstance(other, Book):
+            self.book_list.append(other)
+        return self
+
+    def __sub__(self, other):
+        if isinstance(other, Book) and other in self.book_list:
+            self.book_list.remove(other)
+        elif isinstance(other, int) and other < len(self.book_list):
+            self.book_list.pop(other)
+        return self
+
+    def __len__(self):
+        return len(self.book_list)
+
+
+b1 = Book('Война и мир', 'Лев Толстой', 1867)
+b2 = Book('Искусство войны', 'Сунь Цзы', -325)
+l1 = Lib()
+l1 = l1 + b1
+l1 += b2
+print(len(l1))
+print(l1.__dict__)
+l1 -= b1
+print(l1.__dict__)
+l1 = l1 - 0
+print(l1.__dict__)
+
+
+# Task 8
+class Budget:
+    def __init__(self):
+        self.item_list = []
+
+    def add_item(self, it):
+        if isinstance(it, Item):
+            self.item_list.append(it)
+
+    def remove_item(self, indx):
+        if type(indx) == int and indx < len(self.item_list):
+            self.item_list.pop(indx)
+
+    def get_items(self):
+        return self.item_list
+
+
+# аннотация аргументов для нескольких типов работает только начиная с Python3.10
+class Item:
+    def __init__(self, name: str, money: int | float):
+        self.name = name
+        self.money = money
+
+    def __add__(self, other):
+        addend = 0
+        if isinstance(other, Item):
+            addend = other.money
+        elif isinstance(other, (int, float)):
+            addend = other
+        return self.money + addend
+
+    def __radd__(self, other):
+        return self + other
+
+
+item1 = Item('Отпуск', 300_000)
+item2 = Item('Телефончик', 70_000)
+item3 = Item('Экскурсии', 30_000)
+print(item1.__dict__)
+vacation_budget = Budget()
+vacation_budget.add_item(item1)
+vacation_budget.add_item(item2)
+vacation_budget.add_item(item3)
+s = 0
+for x in vacation_budget.get_items():
+    s = s + x
+print(s)
+print(item1 + item2 + item3)
+print(20_000 + item3)
+print(item2 + 10_000)
+
+my_budget = Budget()
+my_budget.add_item(Item("Курс по Python ООП", 2000))
+my_budget.add_item(Item("Курс по Django", 5000.01))
+my_budget.add_item(Item("Курс по NumPy", 0))
+my_budget.add_item(Item("Курс по C++", 1500.10))
+# вычисление общих расходов
+s = 0
+for x in my_budget.get_items():
+    s = s + x
+print(s)
+
+
+
