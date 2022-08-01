@@ -586,22 +586,6 @@ class Item:
         return self + other
 
 
-item1 = Item('Отпуск', 300_000)
-item2 = Item('Телефончик', 70_000)
-item3 = Item('Экскурсии', 30_000)
-print(item1.__dict__)
-vacation_budget = Budget()
-vacation_budget.add_item(item1)
-vacation_budget.add_item(item2)
-vacation_budget.add_item(item3)
-s = 0
-for x in vacation_budget.get_items():
-    s = s + x
-print(s)
-print(item1 + item2 + item3)
-print(20_000 + item3)
-print(item2 + 10_000)
-
 my_budget = Budget()
 my_budget.add_item(Item("Курс по Python ООП", 2000))
 my_budget.add_item(Item("Курс по Django", 5000.01))
