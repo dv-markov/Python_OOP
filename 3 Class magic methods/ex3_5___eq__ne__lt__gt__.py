@@ -35,9 +35,10 @@ print(c1 == 1000)
 print(c1 != c2)
 print(c1 != c3)
 
-
 print("""
 Сравнение больше / меньше:""")
+
+
 # операторы <, <=, >, >= по умолчанию не реализованы
 # необходимо их прописать
 class Clock:
@@ -80,6 +81,8 @@ print(c1 > c3)
 
 print("""
 Сравнение <= / >=""")
+
+
 class Clock:
     __DAY = 86400  # число секунд в одном дне
 
@@ -134,7 +137,7 @@ class Track:
         return tuple(self.track_lst[1:])
 
     def __get_len(self, i):
-        x1, y1 = self.track_lst[i-1].coords
+        x1, y1 = self.track_lst[i - 1].coords
         x2, y2 = self.track_lst[i].coords
         return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
 
@@ -256,7 +259,6 @@ for x in lst_shop:
 for x in lst_shop_sorted:
     print(x.name, x.dim._Dimensions__get_vol())
 
-
 # Variant 2 - c дескриптором
 # Data Descriptor with private properties
 # class Desc:
@@ -295,10 +297,47 @@ for x in lst_shop_sorted:
 
 
 # Task 5
+
+
 stich = ["Я к вам пишу – чего же боле?",
-        "Что я могу еще сказать?",
-        "Теперь, я знаю, в вашей воле",
-        "Меня презреньем наказать.",
-        "Но вы, к моей несчастной доле",
-        "Хоть каплю жалости храня,",
-        "Вы не оставите меня."]
+         "Что я могу еще сказать?",
+         "Теперь, я знаю, в вашей воле",
+         "Меня презреньем наказать.",
+         "Но вы, к моей несчастной доле",
+         "Хоть каплю жалости храня,",
+         "Вы не оставите меня."]
+
+
+class StringText:
+    def __init__(self, lst_words):
+        self.lst_words = lst_words
+
+    def __gt__(self, other):
+        if isinstance(other, self.__class__):
+            return len(self.lst_words) > len(other.lst_words)
+
+    def __ge__(self, other):
+        if isinstance(other, self.__class__):
+            return len(self.lst_words) >= len(other.lst_words)
+
+
+# lst = [y.strip() for x in stich for y in x.split()]
+lst = [[y.strip('–?!,.;') for y in x.split() if y not in "–?!,.;"] for x in stich]
+# print(lst)
+# lst_text = [StringText(x) for x in lst]
+lst_text = map(StringText, lst)
+
+# for item in lst_text:
+#     print(item.lst_words)
+#
+# print(lst_text[0] > lst_text[1])
+# print(lst_text[1] <= lst_text[2])
+
+lst_text_sorted = sorted(lst_text, reverse=True)
+# for item in lst_text_sorted:
+#     print(len(item.lst_words), item.lst_words)
+
+# lst_text_sorted = list(map(lambda x: ' '.join(x.lst_words), lst_text_sorted))
+lst_text_sorted = [' '.join(x.lst_words) for x in lst_text_sorted]
+# for item in lst_text_sorted:
+#     print(len(item), item)
