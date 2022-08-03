@@ -1,4 +1,6 @@
 # 3.5 Сравнения __eq__, __ne__, __lt__, __gt__ и другие
+import string
+
 
 class Clock:
     __DAY = 86400  # число секунд в одном дне
@@ -297,8 +299,6 @@ for x in lst_shop_sorted:
 
 
 # Task 5
-
-
 stich = ["Я к вам пишу – чего же боле?",
          "Что я могу еще сказать?",
          "Теперь, я знаю, в вашей воле",
@@ -321,10 +321,8 @@ class StringText:
             return len(self.lst_words) >= len(other.lst_words)
 
 
-# lst = [y.strip() for x in stich for y in x.split()]
 lst = [[y.strip('–?!,.;') for y in x.split() if y not in "–?!,.;"] for x in stich]
 # print(lst)
-# lst_text = [StringText(x) for x in lst]
 lst_text = map(StringText, lst)
 
 # for item in lst_text:
@@ -337,7 +335,56 @@ lst_text_sorted = sorted(lst_text, reverse=True)
 # for item in lst_text_sorted:
 #     print(len(item.lst_words), item.lst_words)
 
-# lst_text_sorted = list(map(lambda x: ' '.join(x.lst_words), lst_text_sorted))
 lst_text_sorted = [' '.join(x.lst_words) for x in lst_text_sorted]
 # for item in lst_text_sorted:
 #     print(len(item), item)
+
+
+# Task 6
+from string import punctuation
+
+
+class Morph:
+    def __init__(self, *words):
+        self.lst_words = [word.lower() for word in words]
+
+    def add_word(self, word):
+        self.lst_words.append(word.lower())
+
+    def get_words(self):
+        return tuple(self.lst_words)
+
+    def __eq__(self, other):
+        return other.lower() in self.lst_words
+
+
+wrds = ('связь, связи, связью, связей, связями, связях',
+        'формула, формулы, формуле, формулу, формулой, формул, формулам, формулами, формулах',
+        'вектор, вектора, вектору, вектором, векторе, векторы, векторов, векторам, векторами, векторах',
+        'эффект, эффекта, эффекту, эффектом, эффекте, эффекты, эффектов, эффектам, эффектами, эффектах',
+        'день, дня, дню, днем, дне, дни, дням, днями, днях')
+
+# dict_words = [Morph(*(y.strip(',') for y in x.split())) for x in wrds]
+dict_words = [Morph(*x.split(', ')) for x in wrds]
+print(dict_words)
+for x in dict_words:
+    print(x.get_words())
+
+# text = input()
+text = 'Мы будем устанавливать связь завтра днем.'
+
+print(punctuation)
+print([x.strip(punctuation) in dict_words for x in text.split()])
+
+res = sum(x.strip(punctuation) in dict_words for x in text.split())
+print(res)
+
+# Varsion 2
+# s = """- связь, связи, связью, связи, связей, связям, связями, связях
+# - формула, формулы, формуле, формулу, формулой, формул, формулам, формулами, формулах
+# - вектор, вектора, вектору, вектором, векторе, векторы, векторов, векторам, векторами, векторах
+# - эффект, эффекта, эффекту, эффектом, эффекте, эффекты, эффектов, эффектам, эффектами, эффектах
+# - день, дня, дню, днем, дне, дни, дням, днями, днях
+# """
+#
+# dict_words = [Morph(*line.lstrip('- ').split(', ')) for line in s.splitlines()]
