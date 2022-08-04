@@ -379,7 +379,7 @@ print([x.strip(punctuation) in dict_words for x in text.split()])
 res = sum(x.strip(punctuation) in dict_words for x in text.split())
 print(res)
 
-# Varsion 2
+# Version 2
 # s = """- связь, связи, связью, связи, связей, связям, связями, связях
 # - формула, формулы, формуле, формулу, формулой, формул, формулам, формулами, формулах
 # - вектор, вектора, вектору, вектором, векторе, векторы, векторов, векторам, векторами, векторах
@@ -388,3 +388,47 @@ print(res)
 # """
 #
 # dict_words = [Morph(*line.lstrip('- ').split(', ')) for line in s.splitlines()]
+
+
+# Task 7
+class FileAcceptor:
+    def __init__(self, *extensions):
+        self.extension_tpl = extensions
+
+    def __call__(self, filename: str, *args, **kwargs):
+        return filename.endswith(self.extension_tpl)
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            return FileAcceptor(*set(self.extension_tpl + other.extension_tpl))
+
+
+acceptor1 = FileAcceptor("jpg", "jpeg", "png")
+acceptor2 = FileAcceptor("png", "bmp")
+filenames = ["boat.jpg", "ans.web.png", "text.txt", "www.python.doc", "my.ava.jpg", "forest.jpeg", "eq_1.png", "eq_2.xls"]
+
+print(acceptor1(filenames[1]))
+print(acceptor2(filenames[1]))
+acceptor12 = acceptor1 + acceptor2
+print(acceptor12.extension_tpl)
+
+acceptor_images = FileAcceptor("jpg", "jpeg", "png")
+acceptor_docs = FileAcceptor("txt", "doc", "xls")
+filenames2 = list(filter(acceptor_images + acceptor_docs, filenames))
+print(filenames2)
+
+
+# Variant 2
+class FileAcceptor:
+    def __init__(self, *args):
+        self.extensions = set(args)
+
+    def __call__(self, file: str):
+        if type(file) is str:
+            return file.endswith(tuple('.' + e for e in self.extensions))
+
+    def __add__(self, other):
+        if type(other) is FileAcceptor:
+            return FileAcceptor(*self.extensions.union(other.extensions))
+
+
