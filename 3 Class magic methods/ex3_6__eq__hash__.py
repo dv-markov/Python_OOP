@@ -87,4 +87,76 @@ for item in lst_in:
     name, weight, price = item.rsplit(maxsplit=2)
     obj = ShopItem(name[:-1], weight, price)
     shop_items.setdefault(obj, [obj, 0])[1] += 1
-print(shop_items)
+print(shop_items, "\n")
+
+
+# Task 7
+print("Task 7")
+import sys
+
+
+class DataBase:
+    def __init__(self, path=None):
+        self.path = path
+        self.dict_db = {}
+
+    def write(self, record):
+        self.dict_db.setdefault(record, []).append(record)
+
+    def read(self, pk):
+        res = [x for value in self.dict_db.values() for x in value if x.pk == pk]
+        return res[0] if len(res) else None
+
+
+class Record:
+    PK = 1
+
+    def __init__(self, fio: str, descr: str, old: int):
+        self.pk = Record.PK
+        Record.PK += 1
+        self.fio = fio
+        self.descr = descr
+        self.old = old
+
+    def __hash__(self):
+        return hash((self.fio.lower(), self.old))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+
+
+# считывание списка из входного потока
+# lst_in = list(map(str.strip, sys.stdin.readlines())) # список lst_in не менять!
+
+# здесь продолжайте программу (используйте список строк lst_in)
+lst_in = ['Балакирев С.М.; программист; 33',
+          'Кузнецов Н.И.; разведчик-нелегал; 35',
+          'Суворов А.В.; полководец; 42',
+          'Иванов И.И.; фигурант всех подобных списков; 26',
+          'Балакирев С.М.; преподаватель; 33'
+          ]
+
+db = DataBase()
+for entry in lst_in:
+    *strings, num = entry.split("; ")
+    db.write(Record(*strings, int(num)))
+
+print(db.dict_db)
+print(db.read(1))
+
+# Объединение вложенных списков
+# sum([[1, 2], [3, 4]], []) == [1, 2, 3, 4]
+
+# распаковка итерируемого объекта из одного элемента
+# def read(self, pk):
+#     return next(obj for lst in self.dict_db.values() for obj in lst if obj.pk == pk)
+
+# манипуляции со значениями, прочитанными их входного потока
+# for l in lst_in:
+#     args = list(map(str.strip, l.split(';')))
+#     args[-1] = int(args[-1])
+#     db.write(Record(*args))
+
+
+
