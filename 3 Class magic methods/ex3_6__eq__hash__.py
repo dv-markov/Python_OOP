@@ -4,7 +4,7 @@ print("""
 Задачи""")
 
 
-#Task 4
+# Task 4
 class Rect:
     def __init__(self, x, y, width, height):
         self.coords = x, y
@@ -18,9 +18,8 @@ class Rect:
 r1 = Rect(10, 5, 100, 50)
 r2 = Rect(-10, 4, 100, 50)
 
-h1, h2 = hash(r1), hash(r2)   # h1 == h2
+h1, h2 = hash(r1), hash(r2)  # h1 == h2
 print(h1, h2, sep="\n")
-
 
 # Task 6
 import sys
@@ -88,7 +87,6 @@ for item in lst_in:
     obj = ShopItem(name[:-1], weight, price)
     shop_items.setdefault(obj, [obj, 0])[1] += 1
 print(shop_items, "\n")
-
 
 # Task 7
 print("Task 7")
@@ -158,5 +156,73 @@ print(db.read(1))
 #     args[-1] = int(args[-1])
 #     db.write(Record(*args))
 
+# Task 8
+import sys
 
+
+class BookStudy:
+    def __init__(self, name: str, author: str, year: int):
+        self.name = name
+        self.author = author
+        self.year = year
+
+    def __hash__(self):
+        return hash((self.name.lower(), self.author.lower()))
+
+    def __eq__(self, other):
+        if isinstance(other, BookStudy):
+            return hash(self) == hash(other)
+
+
+# считывание списка из входного потока
+# lst_in = list(map(str.strip, sys.stdin.readlines()))  # список lst_in не менять!
+lst_in = [
+    'Python; Балакирев С.М.; 2020',
+    'Python ООП; Балакирев С.М.; 2021',
+    'Python ООП; Балакирев С.М.; 2022',
+    'Python; Балакирев С.М.; 2021',
+]
+
+print(lst_in)
+lst_bs = []
+for x in lst_in:
+    args = list(map(str.strip, x.split(';')))
+    args[-1] = int(args[-1])
+    lst_bs.append(BookStudy(*args))
+
+unique_books = len(set(lst_bs))
+print(unique_books)
+
+
+# Variant 2
+# lst_bs = [BookStudy(*line.split('; ')) for line in lst_in]
+# unique_books = len(set(map(hash, lst_bs)))
+
+# Task 9
+class Dimensions:
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def __setattr__(self, key, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise ValueError("габаритные размеры должны быть положительными числами")
+        return super().__setattr__(key, value)
+
+    def __hash__(self):
+        return hash((self.a, self.b, self.c))
+
+
+lst_in = ["1 2 3", "4 5 6.78", "1 2 3", "3 1 2.5"]
+# lst_in = input().split('; ')
+print(lst_in)
+lst_dims = [Dimensions(*map(float, x.split())) for x in lst_in]
+for x in lst_dims:
+    print(x.a, x.b, x.c, hash(x))
+print()
+
+lst_dims.sort(key=hash)
+for x in lst_dims:
+    print(x.a, x.b, x.c, hash(x))
 
