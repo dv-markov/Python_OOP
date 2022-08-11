@@ -226,3 +226,46 @@ lst_dims.sort(key=hash)
 for x in lst_dims:
     print(x.a, x.b, x.c, hash(x))
 
+
+# Task 10
+class DimTriangle:
+    def __set_name__(self, owner, name):
+        self.name = "_" + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise ValueError("длины сторон треугольника должны быть положительными числами")
+        setattr(instance, self.name, value)
+
+
+class Triangle:
+    a = DimTriangle()
+    b = DimTriangle()
+    c = DimTriangle()
+
+    def _perimeter(self):
+        return self.a + self.b + self.c
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+        if 2 * max(a, b, c) >= self._perimeter():
+            raise ValueError("с указанными длинами нельзя образовать треугольник")
+
+    def __len__(self):
+        return int(self._perimeter())
+
+    def __call__(self, *args, **kwargs):
+        p = self._perimeter() / 2
+        return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** 0.5
+
+
+tr = Triangle(3, 2, 4)
+print(tr.__dict__)
+print(len(tr))
+print(tr())
+
