@@ -226,6 +226,37 @@ lst_dims.sort(key=hash)
 for x in lst_dims:
     print(x.a, x.b, x.c, hash(x))
 
+# Variant 2
+# С Typing и TypeVar
+# Используется для аннотации типов
+
+# from typing import TypeVar
+#
+# T = TypeVar("T", int, float)
+#
+# class Dimensions:
+#     def __new__(cls, *args, **kwargs):
+#         if not all(i > 0 for i in args):
+#             raise ValueError(
+#                 "габаритные размеры должны быть положительными числами"
+#             )
+#         return super().__new__(cls)
+#
+#     def __init__(self, a: T, b: T, c: T):
+#         self.c = c
+#         self.b = b
+#         self.a = a
+#
+#     def __hash__(self):
+#         return hash((self.a, self.b, self.c))
+#
+#     def __repr__(self):
+#         return str(hash(self))
+#
+#
+# s_inp = input()
+# lst_dims = [Dimensions(*map(float, i.split())) for i in s_inp.split("; ")]
+# lst_dims.sort(key=hash)
 
 # Task 10
 class DimTriangle:

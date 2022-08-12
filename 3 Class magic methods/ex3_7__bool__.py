@@ -78,3 +78,79 @@ else:
 print(p)
 print(bool(p1))
 
+print("""
+Задачи""")
+
+
+# Task 4
+# Version 0
+# class Player:
+#     def __init__(self, name, old, score):
+#         self.name = name
+#         self.old = old
+#         self.score = score
+#
+#     def __bool__(self):
+#         return bool(self.score)
+#
+#
+# # lst_in = list(map(str.strip, sys.stdin.readlines()))
+# lst_in = ['Балакирев; 34; 2048',
+#           'Mediel; 27; 0',
+#           'Влад; 18; 9012',
+#           'Nina P; 33; 0']
+#
+# # players = [Player(*p.split('; ')) for p in lst_in]
+#
+# players = []
+# for p in lst_in:
+#     args = p.split('; ')
+#     args[1:] = list(map(int, args[1:]))
+#     players.append(Player(*args))
+# players_filtered = filter(bool, players)
+#
+# for p in players_filtered:
+#     print(p.__dict__)
+
+# Version 1
+class Player:
+    def __init__(self, name, old, score):
+        self.name = name
+        self.old = int(old)
+        self.score = int(score)
+
+    def __bool__(self):
+        return bool(self.score)
+
+
+# lst_in = list(map(str.strip, sys.stdin.readlines()))
+lst_in = ['Балакирев; 34; 2048',
+          'Mediel; 27; 0',
+          'Влад; 18; 9012',
+          'Nina P; 33; 0']
+
+players = [Player(*p.split('; ')) for p in lst_in]
+players_filtered = list(filter(bool, players))
+
+for p in players_filtered:
+    print(p.__dict__)
+
+# Version 2
+# class Player:
+#     def __init__(self, name: str, old: int, score: int):
+#         self.name = name
+#         self.old = old
+#         self.score = score
+#
+#     def __bool__(self):
+#         return self.score > 0
+#
+# players = [Player(*map(lambda x: int(x) if x.isdigit() else x, line.split('; '))) for line in lst_in]
+# players_filtered = list(filter(lambda x: bool(x), players))
+
+# Version 3
+# None для фильтра работает, как bool
+# players_filtered = list(filter(None, players))
+
+
+# Task 5
