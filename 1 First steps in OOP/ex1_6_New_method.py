@@ -17,7 +17,7 @@ print(pt)
 
 # Начиная с Python 3, все классы наследуются от базового класса Object
 
-
+# Singleton
 # Паттерн проектирования Singleton
 class DataBase:
     __instance = None
