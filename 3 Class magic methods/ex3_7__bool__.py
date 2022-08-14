@@ -253,15 +253,10 @@ class GamePole:
         return cls.__instance
 
     def __init__(self, N, M, total_mines):
-        # if type(N) == int and type(M) == int and N > 0 and M > 0:
         self.__pole_cells = tuple(tuple(Cell() for _ in range(M)) for _ in range(N))
         self.__n = N
         self.__m = M
-        # if type(total_mines) == int and 0 <= total_mines <= M * N:
         self.total_mines = total_mines
-
-    # def __setattr__(self, key, value):
-    #     if key in ('__n')
 
     @property
     def pole(self):
@@ -366,3 +361,104 @@ for row in pole.pole:
     for cell in row:
         cell.is_open = True
 pole.show_pole()
+
+# Variant 2
+# С дескриптором для класса Cell
+# Дескриптор для приватных аттрибутов
+# Descriptor for private attributes
+# class CellDescr:
+#     def __set_name__(self, owner, name):
+#         self.name = f'_{owner.__name__}__{name}'
+#
+#     def __set__(self, instance, value):
+#         if not (isinstance(value, int) and 0 <= value <= 8):
+#             raise ValueError("недопустимое значение атрибута")
+#         return setattr(instance, self.name, value)
+#
+#     def __get__(self, instance, owner):
+#         if instance is None:
+#             return property()
+#         return getattr(instance, self.name)
+#
+#
+# class Cell:
+#     is_mine = CellDescr()
+#     number = CellDescr()
+#     is_open = CellDescr()
+#
+#     def __init__(self):
+#         self.__is_mine = False
+#         self.__number = 0
+#         self.__is_open = False
+#
+#     def __bool__(self):
+#         return not self.is_open
+
+# Variant 3 - shuffle для расстановки мин
+# from random import shuffle
+# def init_pole(self):
+#     self.mine_init = [False if x > total_mines else True for x in range(1, m * n + 1)]
+#     shuffle(self.mine_init)
+#     i = 0
+#     for line in self.pole:
+#         for cell in line:
+#             cell.is_mine = self.mine_init[i]
+#             cell.is_open = False
+#             i += 1
+
+
+# Task 9
+class Vector:
+    def __init__(self, *coords):
+        self.coords = list(coords)
+
+    def calc(self, other, op):
+        oth_type = type(other)
+        # if oth_type not in (int, float, Vector):
+        #     raise TypeError('Второй операнд должен быть int, float или Vector')
+        if oth_type in (int, float):
+            return [getattr(x, op)(other) for x in self.coords]
+        if oth_type == self.__class__:
+            if len(self.coords) != len(other.coords):
+                raise ArithmeticError('размерности векторов не совпадают')
+            return [getattr(self.coords[i], op)(other.coords[i]) for i in range(len(self.coords))]
+
+    def __add__(self, other):
+        return Vector(*self.calc(other, '__add__'))
+
+    def __sub__(self, other):
+        return Vector(*self.calc(other, '__sub__'))
+
+    def __mul__(self, other):
+        return Vector(*self.calc(other, '__mul__'))
+
+    def __iadd__(self, other):
+        self.coords = self.calc(other, '__add__')
+        return self
+
+    def __isub__(self, other):
+        self.coords = self.calc(other, '__sub__')
+        return self
+
+    def __eq__(self, other):
+        if type(other) == self.__class__:
+            return all(x == y for x, y in zip(self.coords, other.coords))
+
+
+v1 = Vector(3, 2, 1)
+print(v1.__dict__)
+v2 = Vector(5, 6, 7)
+# v2 = 10
+# print(v2.__dict__)
+v3 = v1 + v2
+print(v3.__dict__)
+print((v1 - v2).__dict__)
+print((v1 * v2).__dict__)
+v1 += v2
+print(v1.__dict__)
+v1 -= v2
+print(v1.__dict__)
+
+print(v3 == Vector(8, 8, 8))
+print(v1 == v2)
+
