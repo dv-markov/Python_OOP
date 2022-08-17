@@ -254,6 +254,7 @@ for row in table.cells:
         print(x.value, end=' ')
     print()
 
+
 # Д/З
 class StringValue:
     def __set_name__(self, owner, name):
