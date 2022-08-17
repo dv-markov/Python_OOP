@@ -366,6 +366,7 @@ pole.show_pole()
 # С дескриптором для класса Cell
 # Дескриптор для приватных аттрибутов
 # Descriptor for private attributes
+
 # class CellDescr:
 #     def __set_name__(self, owner, name):
 #         self.name = f'_{owner.__name__}__{name}'
