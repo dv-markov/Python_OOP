@@ -353,7 +353,7 @@ a = st.pop()
 print(a.data if a else None)
 
 
-# Task 7
+# Task 7 - slices for classes
 class RadiusVector:
     def __init__(self, *coords):
         self.coords = list(coords)
@@ -373,3 +373,81 @@ print(v[2]) # 3
 print(v[1:]) # (2, 3, 4)
 v[0] = 10.5
 
+
+# Task 8
+class Cell:
+    def __init__(self):
+        self.is_free = True
+        self.value = 0
+
+    def __bool__(self):
+        return self.is_free
+
+    def __setattr__(self, key, value):
+        if key == 'value' and value > 0:
+            if not self.is_free:
+                raise ValueError('клетка уже занята')
+            else:
+                self.is_free = False
+        super().__setattr__(key, value)
+
+
+class TicTacToe:
+    def __init__(self):
+        self.pole = tuple(tuple(Cell() for _ in range(3)) for _ in range(3))
+
+    def clear(self):
+        for row in self.pole:
+            for cell in row:
+                cell.is_free = True
+                cell.value = 0
+
+    def __check(self, indx):
+        for x in indx:
+            if type(x) not in (int, slice) or (type(x) == int and (x < 0 or x > 2)):
+                raise IndexError('неверный индекс клетки')
+        return indx
+
+    def __getitem__(self, item):
+        i, j = self.__check(item)
+        if type(i) == slice:
+            return tuple(x[j].value for x in self.pole)
+        if type(j) == slice:
+            return tuple(x.value for x in self.pole[i])
+        return self.pole[i][j].value
+
+    def __setitem__(self, key, value):
+        i, j = self.__check(key)
+        self.pole[i][j].value = value
+
+
+game = TicTacToe()
+for row in game.pole:
+    print(*(map(lambda x: x.value, row)))
+game.clear()
+game[0, 0] = 1
+game[1, 0] = 2
+for row in game.pole:
+    print(*(map(lambda x: x.value, row)))
+# формируется поле:
+# 1 0 0
+# 2 0 0
+# 0 0 0
+# game[3, 2] = 2 # генерируется исключение IndexError
+if game[0, 0] == 0:
+    game[0, 0] = 2
+v1 = game[0, :]  # 1, 0, 0
+v2 = game[:, 0]  # 1, 2, 0
+print(v1)
+print(v2)
+print(game[0, 0])
+
+# Variant 2
+# def __setitem__(self, key, value):
+#     self.__check(key)
+#     r, c = key
+#     if self.pole[r][c]:
+#         self.pole[r][c].value = value
+#         self.pole[r][c].is_free = False
+#     else:
+#         raise ValueError('клетка уже занята')
