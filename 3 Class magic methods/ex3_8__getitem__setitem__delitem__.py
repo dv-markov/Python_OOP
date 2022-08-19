@@ -276,4 +276,100 @@ class CellString:
         self.value = start_value
 
 
-# Task
+# Task 6
+# Variant 0
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.last = None
+        self.ln = 0
+
+    def push(self, obj):
+        if self.top is None:
+            self.top = obj
+        if self.last:
+            self.last.next = obj
+        self.last = obj
+        self.ln += 1
+
+    def pop(self):
+        res = self.last
+        if self.top:
+            if self.top.next:
+                tmp = self.top
+                while tmp.next.next:
+                    tmp = tmp.next
+                tmp.next = None
+                self.last = tmp
+                self.ln -= 1
+            else:
+                self.top = self.last = None
+                self.ln = 0
+        return res
+
+    def __check(self, indx):
+        if type(indx) != int or indx < 0 or indx >= self.ln:
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check(item)
+        if self.top:
+            i = 0
+            tmp = self.top
+            while i < item:
+                tmp = tmp.next
+                i += 1
+            return tmp
+
+    def __setitem__(self, key, value):
+        self.__check(key)
+        if self.top:
+            i = 0
+            tmp = self.top
+            while i < key - 1:
+                tmp = tmp.next
+                i += 1
+            value.next = tmp.next.next
+            tmp.next = value
+
+
+st = Stack()
+st.push(StackObj("obj1"))
+st.push(StackObj("obj2"))
+st.push(StackObj("obj3"))
+st[1] = StackObj("new obj2")
+print(st[2].data)  # obj3
+print(st[1].data)  # new obj2
+print(st.pop().data)
+print(st.pop().data)
+print(st.pop().data)
+a = st.pop()
+print(a.data if a else None)
+
+
+# Task 7
+class RadiusVector:
+    def __init__(self, *coords):
+        self.coords = list(coords)
+
+    def __getitem__(self, item):
+        res = self.coords[item]
+        return tuple(res) if isinstance(res, list) else res
+
+    def __setitem__(self, key, value):
+        self.coords[key] = value
+
+
+v = RadiusVector(1, 1, 1, 1)
+print(v[1]) # 1
+v[:] = 1, 2, 3, 4
+print(v[2]) # 3
+print(v[1:]) # (2, 3, 4)
+v[0] = 10.5
+
