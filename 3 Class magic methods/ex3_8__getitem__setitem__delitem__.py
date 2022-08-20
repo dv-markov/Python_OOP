@@ -277,7 +277,7 @@ class CellString:
 
 
 # Task 6
-# Variant 0
+# Variant 1
 class StackObj:
     def __init__(self, data):
         self.data = data
@@ -353,6 +353,71 @@ a = st.pop()
 print(a.data if a else None)
 
 
+# Variant 2
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.__count_objs = 0
+
+    def push(self, obj):
+        last = self[self.__count_objs - 1] if self.__count_objs > 0 else None
+
+        if last:
+            last.next = obj
+
+        if self.top is None:
+            self.top = obj
+
+        self.__count_objs += 1
+
+    def pop(self):
+        if self.__count_objs == 0:
+            return None
+
+        last = self[self.__count_objs - 1]
+
+        if self.__count_objs == 1:
+            self.top = None
+        else:
+            self[self.__count_objs - 2].next = None
+
+        self.__count_objs -= 1
+        return last
+
+    def __check_index(self, item):
+        if type(item) != int or not (0 <= item < self.__count_objs):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        count = 0
+        h = self.top
+        while h and count < item:
+            h = h.next
+            count += 1
+
+        return h
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+
+        obj = self[key]
+        prev = self[key - 1] if key > 0 else None
+
+        value.next = obj.next
+        if prev:
+            prev.next = value
+
+
+st = Stack()
+st.push(StackObj("obj1"))
+st.push(StackObj("obj2"))
+st.push(StackObj("obj3"))
+st[1] = StackObj("new obj2")
+print(st[2].data)  # obj3
+print(st[1].data)  # new obj2
+
+
 # Task 7 - slices for classes
 class RadiusVector:
     def __init__(self, *coords):
@@ -361,6 +426,7 @@ class RadiusVector:
     def __getitem__(self, item):
         res = self.coords[item]
         return tuple(res) if isinstance(res, list) else res
+        # return tuple(self.coords[item]) if type(item) == slice else self.coords[item]
 
     def __setitem__(self, key, value):
         self.coords[key] = value
@@ -451,3 +517,235 @@ print(game[0, 0])
 #         self.pole[r][c].is_free = False
 #     else:
 #         raise ValueError('клетка уже занята')
+
+
+print('\n', 'Task 9', sep='')
+
+
+# Task 9
+class Bag:
+    def __init__(self, max_weight):
+        self.max_weight = max_weight
+        self.things = []
+
+    def __check_weight(self, thing, indx=None):
+        current_weight = sum(map(lambda x: x.weight, self.things))
+        if current_weight + thing.weight - (self.things[indx].weight if indx is not None else 0) > self.max_weight:
+            raise ValueError('превышен суммарный вес предметов')
+
+    def __check_indx(self, indx):
+        border = len(self.things)
+        if type(indx) != int or not (-border <= indx < border):
+            raise IndexError('неверный индекс')
+
+    def add_thing(self, thing):
+        self.__check_weight(thing)
+        self.things.append(thing)
+
+    def __getitem__(self, item):
+        self.__check_indx(item)
+        return self.things[item]
+
+    def __setitem__(self, key, value):
+        self.__check_indx(key)
+        self.__check_weight(value, key)
+        self.things[key] = value
+
+    def __delitem__(self, key):
+        self.__check_indx(key)
+        self.things.pop(key)
+
+
+class Thing:
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+
+
+bag = Bag(1000)
+bag.add_thing(Thing('книга', 100))
+bag.add_thing(Thing('носки', 200))
+bag.add_thing(Thing('рубашка', 500))
+# bag.add_thing(Thing('ножницы', 300)) # генерируется исключение ValueError
+print(bag[2].name) # рубашка
+bag[1] = Thing('платок', 100)
+print(bag[1].name) # платок
+del bag[0]
+print(bag[0].name) # платок
+# t = bag[4] # генерируется исключение IndexError
+
+# тесты
+b = Bag(700)
+b.add_thing(Thing('книга', 100))
+b.add_thing(Thing('носки', 200))
+
+try:
+    b.add_thing(Thing('рубашка', 500))
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError"
+
+assert b[0].name == 'книга' and b[
+    0].weight == 100, "атрибуты name и weight объекта класса Thing принимают неверные значения"
+
+t = Thing('Python', 20)
+b[1] = t
+assert b[1].name == 'Python' and b[
+    1].weight == 20, "неверные значения атрибутов name и weight, возможно, некорректно работает оператор присваивания с объектами класса Thing"
+
+del b[0]
+assert b[0].name == 'Python' and b[0].weight == 20, "некорректно отработал оператор del"
+
+try:
+    t = b[2]
+except IndexError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение IndexError"
+
+b = Bag(700)
+b.add_thing(Thing('книга', 100))
+b.add_thing(Thing('носки', 200))
+
+b[0] = Thing('рубашка', 500)
+
+try:
+    b[0] = Thing('рубашка', 800)
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError при замене предмета в объекте класса Bag по индексу"
+
+
+# Task 10
+class SparseTable:
+    def __init__(self):
+        self.rows = 0
+        self.cols = 0
+        self.table = {}
+
+    def __update_rc(self, r, c):
+        self.rows = max(self.rows, r + 1)
+        self.cols = max(self.cols, c + 1)
+
+    def add_data(self, row, col, data):
+        if (row, col) not in self.table:
+            self.__update_rc(row, col)
+        self.table[(row, col)] = data
+
+    def remove_data(self, row, col):
+        if (row, col) in self.table:
+            self.table.pop((row, col))
+            if row + 1 == self.rows or col + 1 == self.cols:
+                self.rows = self.cols = 0
+                for r, c in self.table.keys():
+                    self.__update_rc(r, c)
+        else:
+            raise IndexError('ячейка с указанными индексами не существует')
+
+    def __getitem__(self, item):
+        if item not in self.table:
+            raise ValueError('данные по указанным индексам отсутствуют')
+        return self.table.get(item).value
+
+    def __setitem__(self, key, value):
+        if key in self.table:
+            self.table[key].value = value
+        else:
+            self.add_data(*key, Cell(value))
+
+
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+
+st = SparseTable()
+print(st.__dict__)
+st.add_data(2, 5, Cell("cell_25"))
+print(st.__dict__)
+st.add_data(0, 0, Cell("cell_00"))
+print(st.__dict__)
+print(st[2, 5])
+st[0, 0] = 'zero'
+print(st[0, 0])
+
+# тесты
+st = SparseTable()
+st.add_data(2, 5, Cell(25))
+st.add_data(1, 1, Cell(11))
+assert st.rows == 3 and st.cols == 6, "неверные значения атрибутов rows и cols"
+
+try:
+    v = st[3, 2]
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError"
+
+st[3, 2] = 100
+assert st[3, 2] == 100, "неверно отработал оператор присваивания нового значения в ячейку таблицы"
+assert st.rows == 4 and st.cols == 6, "неверные значения атрибутов rows и cols"
+
+st.remove_data(1, 1)
+try:
+    v = st[1, 1]
+except ValueError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение ValueError"
+
+try:
+    st.remove_data(1, 1)
+except IndexError:
+    assert True
+else:
+    assert False, "не сгенерировалось исключение IndexError"
+
+d = Cell('5')
+assert d.value == '5', "неверное значение атрибута value в объекте класса Cell, возможно, некорректно работает инициализатор класса"
+
+# Variant 2
+class Cell:
+    def __init__(self, value):
+        self.value = value
+
+class SparseTable:
+    def __init__(self):
+        self.tbl = {}
+
+    @property
+    def rows(self):
+        return max(i[0] for i in self.tbl) + 1 if self.tbl else 0
+
+    @property
+    def cols(self):
+        return max(i[1] for i in self.tbl) + 1 if self.tbl else 0
+
+    def add_data(self, row, col, data):
+        self.tbl[row, col] = data
+
+    def remove_data(self, row, col):
+        if not (row, col) in self.tbl:
+            raise IndexError('ячейка с указанными индексами не существует')
+        del self.tbl[row, col]
+
+    def __getitem__(self, key):
+        if not key in self.tbl:
+            raise ValueError('данные по указанным индексам отсутствуют')
+        return self.tbl[key].value
+
+    def __setitem__(self, key, v):
+        self.tbl.setdefault(key, Cell(0)).value = v
+
+
+st = SparseTable()
+st.add_data(2, 5, Cell("cell_25"))
+st.add_data(0, 0, Cell("cell_00"))
+st[2, 5] = 25 # изменение значения существующей ячейки
+st[11, 7] = 'cell_117' # создание новой ячейки
+print(st[0, 0]) # cell_00
+st.remove_data(2, 5)
+print(st.rows, st.cols) # 12, 8 - общее число строк и столбцов в таблице
+
