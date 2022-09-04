@@ -148,3 +148,105 @@ for x in pers:
 pers[0] = 'Dmitry Markov'
 print(pers[0])
 print(pers[1])
+
+
+# Variant 2 - Balakirev
+class Person1:
+    def __init__(self, fio, job, old, salary, year_job):
+        self.fio = fio
+        self.job = job
+        self.old = old
+        self.salary = salary
+        self.year_job = year_job
+        self._attrs = tuple(self.__dict__)
+        self._len_attrs = len(self._attrs)
+        self._iter_index = - 1
+
+    def __check_index(self, index):
+        if type(index) != int or not (-self._len_attrs <= index < self._len_attrs):
+            raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_index(item)
+        return getattr(self, self._attrs[item])
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        setattr(self, self._attrs[key], value)
+
+    def __iter__(self):
+        self._iter_index = - 1
+        return self
+
+    def __next__(self):
+        if self._iter_index < self._len_attrs - 1:
+            self._iter_index += 1
+            return getattr(self, self._attrs[self._iter_index])
+        raise StopIteration
+
+
+pers1 = Person1('Гейтс Б.', 'бизнесмен', 61, 1000000, 46)
+print(next(pers1))
+
+for x in pers1:
+    print(x)
+pers1[0] = 'Dmitry Markov'
+print(pers1[0])
+print(pers1[1])
+
+
+# Task 6
+class TriangleListIterator:
+    def __init__(self, lst):
+        self.line_lst = [x for i in range(len(lst)) for x in lst[i][:i+1]]
+        self._lst_len = len(self.line_lst)
+        self._iter_indx = - 1
+
+    def __iter__(self):
+        self._iter_indx = - 1
+        return self
+
+    def __next__(self):
+        if self._iter_indx < self._lst_len - 1:
+            self._iter_indx += 1
+            return self.line_lst[self._iter_indx]
+        raise StopIteration
+
+
+lst = [[1],
+       [2, 3],
+       [4, 5, 6],
+       [7, 8, 9, 10]]
+it = TriangleListIterator(lst)
+print(it.__dict__)
+print(next(it))
+
+for x in it:
+    print(x)
+
+it_iter = iter(it)
+x = next(it_iter)
+print(x)
+print(next(it_iter))
+print(next(it_iter))
+
+
+# Variant 2 - Balakirev
+class TriangleListIterator1:
+    def __init__(self, lst):
+        self._lst = lst
+
+    def __iter__(self):
+        for i in range(len(self._lst)):
+            for j in range(i + 1):
+                yield self._lst[i][j]
+
+
+it1 = TriangleListIterator1(lst)
+for x in it1:
+    print(x)
+
+it_iter = iter(it1)
+x = next(it_iter)
+print(x)
+
