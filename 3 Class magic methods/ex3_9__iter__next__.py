@@ -316,11 +316,16 @@ class StackObj:
 class Stack:
     def __init__(self):
         self.top = None
+        self.__len = 0
 
     @staticmethod
     def __check_obj(obj):
         if not isinstance(obj, StackObj):
             raise TypeError('Object should be StackObj type')
+
+    def __check_indx(self, indx):
+        if not (0 <= indx < self.__len):
+            raise IndexError('неверный индекс')
 
     def push_back(self, obj):
         self.__check_obj(obj)
@@ -331,22 +336,50 @@ class Stack:
             while tmp.next:
                 tmp = tmp.next
             tmp.next = obj
+        self.__len += 1
 
     def push_front(self, obj):
         self.__check_obj(obj)
         if self.top:
             obj.next = self.top
         self.top = obj
+        self.__len += 1
 
-    def get_stack(self):
-        if self.top is None:
-            return None
-        res = []
+    def __iter__(self):
         tmp = self.top
         while tmp:
-            res.append(tmp.data)
+            yield tmp
             tmp = tmp.next
-        return res
+
+    def __len__(self):
+        return self.__len
+
+    def __setitem__(self, key, value):
+        self.__check_indx(key)
+        it = iter(self)
+        for _ in range(key):
+            next(it)
+        x = next(it)
+        x.data = value
+
+    def __getitem__(self, item):
+        self.__check_indx(item)
+        it = iter(self)
+        for _ in range(item):
+            next(it)
+        x = next(it)
+        return x.data
+
+
+    # def get_stack(self):
+    #     if self.top is None:
+    #         return None
+    #     res = []
+    #     tmp = self.top
+    #     while tmp:
+    #         res.append(tmp.data)
+    #         tmp = tmp.next
+    #     return res
 
 
 st = Stack()
@@ -354,4 +387,15 @@ st.push_back(StackObj('привет'))
 st.push_back(StackObj('как'))
 st.push_back(StackObj('дела'))
 st.push_front(StackObj('Хэй!'))
-print(*st.get_stack())
+# print(*st.get_stack())
+
+for x in st:
+    print(x.data)
+print(len(st))
+
+st[2] = 'идут'
+for x in st:
+    print(x.data)
+print(st[0])
+
+
