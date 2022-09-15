@@ -262,7 +262,10 @@ class IterColumn:
             yield self._lst[i][self._col]
 
 
-lst = [[11, 12, 13, 14], [21, 22, 23, 24], [31, 32, 33, 34], [41, 42, 43, 44]]
+lst = [[11, 12, 13, 14],
+       [21, 22, 23, 24],
+       [31, 32, 33, 34],
+       [41, 42, 43, 44]]
 
 it = IterColumn(lst, 1)
 for x in it:  # последовательный перебор всех элементов столбца списка: x12, x22, ..., xM2
@@ -278,3 +281,77 @@ print(x)
 #         yield row[self._col]
 
 
+# Task 7 - plane
+class IterColumn:
+    def __init__(self, lst, column):
+        self._lst = lst
+        self._column = column
+
+    def __iter__(self):
+        for row in self._lst:
+            yield row[self._column]
+
+
+lst = [[1, 2, 3],
+       [4, 5, 6],
+       [7, 8, 9]]
+it = IterColumn(lst, 1)
+for x in it:
+    print(x)
+
+it_iter = iter(it)
+x = next(it_iter)
+print(x)
+print(next(it_iter))
+print(next(it_iter))
+
+
+# Task 8 - Stack-like structure
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+
+    @staticmethod
+    def __check_obj(obj):
+        if not isinstance(obj, StackObj):
+            raise TypeError('Object should be StackObj type')
+
+    def push_back(self, obj):
+        self.__check_obj(obj)
+        if self.top is None:
+            self.top = obj
+        else:
+            tmp = self.top
+            while tmp.next:
+                tmp = tmp.next
+            tmp.next = obj
+
+    def push_front(self, obj):
+        self.__check_obj(obj)
+        if self.top:
+            obj.next = self.top
+        self.top = obj
+
+    def get_stack(self):
+        if self.top is None:
+            return None
+        res = []
+        tmp = self.top
+        while tmp:
+            res.append(tmp.data)
+            tmp = tmp.next
+        return res
+
+
+st = Stack()
+st.push_back(StackObj('привет'))
+st.push_back(StackObj('как'))
+st.push_back(StackObj('дела'))
+st.push_front(StackObj('Хэй!'))
+print(*st.get_stack())
