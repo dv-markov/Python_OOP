@@ -453,7 +453,7 @@ class Stack:
 
 # Task 9
 class Cell:
-    def __init__(self, data):
+    def __init__(self, data=0):
         self.data = data
 
     @property
@@ -462,24 +462,18 @@ class Cell:
 
     @data.setter
     def data(self, data):
-        # дописать сравнение с типом данных, записанных в type_data
-        if type(data) != int:
-            raise TypeError("неверный тип данных")
         self.__data = data
-
-    def __repr__(self):
-        return str(self.data)
 
 
 class TableValues:
     def __init__(self, rows, cols, type_data=int):
         self.type_data = type_data
         self.table_size = rows, cols
-        self.table = tuple(tuple(Cell(0) for _ in range(cols)) for _ in range(rows))
+        self.table = tuple(tuple(Cell() for _ in range(cols)) for _ in range(rows))
 
     def __iter__(self):
         for row in self.table:
-            yield row
+            yield (x.data for x in row)
 
     def __check_indx(self, indx):
         for k, k_max in zip(indx, self.table_size):
@@ -493,17 +487,88 @@ class TableValues:
 
     def __setitem__(self, key, value):
         self.__check_indx(key)
+        if type(value) != self.type_data:
+            raise TypeError("неверный тип данных")
         i, j = key
         self.table[i][j].data = value
 
 
-tv = TableValues(3, 3)
-print(tv.__dict__)
-tv[1, 2] = 555
-print(tv[0, 0])
+tv1 = TableValues(3, 3)
+print(tv1.__dict__)
+tv1[1, 2] = 555
+print(tv1[0, 0])
 
-for row in tv:
+for row in tv1:
     for val in row:
         print(val, end=' ')
     print()
+
+
+# Task 10
+class Matrix:
+    def __init__(self, *args):
+        if len(args) == 3 and type(args[0]) == int and type(args[1]) == int and type(args[2]) in (int, float):
+            self.rows, self.cols, fill_value = args
+            self.mtx = [[fill_value for _ in range(self.cols)] for _ in range(self.rows)]
+        elif len(args) == 1 and type(args[0]) == list:
+            self.rows = len(args[0])
+            self.cols = len(args[0][1])
+            if any(map(lambda x: len(x) != self.cols, args[0])) or \
+                    any(type(x) not in (int, float) for row in args[0] for x in row):
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
+            self.mtx = args[0]
+        else:
+            raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
+
+    def __check_indx(self, indx):
+        r, c = indx
+        if type(r) != int or type(c) != int or not (0 <= r < self.rows) or not (0 <= c < self.cols):
+            raise IndexError('недопустимые значения индексов')
+        return r, c
+
+    def __getitem__(self, item):
+        r, c = self.__check_indx(item)
+        return self.mtx[r][c]
+
+    def __setitem__(self, key, value):
+        r, c = self.__check_indx(key)
+        if type(value) not in (int, float):
+            raise TypeError('значения матрицы должны быть числами')
+        self.mtx[r][c] = value
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            if self.rows != other.rows or self.cols != other.cols:
+                raise ValueError('операции возможны только с матрицами равных размеров')
+            return Matrix([[self.mtx[i][j] + other.mtx[i][j] for j in range(self.cols)] for i in range(self.rows)])
+        elif type(other) in (int, float):
+            return Matrix([[self.mtx[i][j] + other for j in range(self.cols)] for i in range(self.rows)])
+
+    def __sub__(self, other):
+        if isinstance(other, self.__class__):
+            if self.rows != other.rows or self.cols != other.cols:
+                raise ValueError('операции возможны только с матрицами равных размеров')
+            return Matrix([[self.mtx[i][j] - other.mtx[i][j] for j in range(self.cols)] for i in range(self.rows)])
+        elif type(other) in (int, float):
+            return self.__add__(-other)
+
+
+matrix = Matrix(2, 2, 1)
+print(matrix.__dict__)
+
+mt = Matrix([[1, 2], [3, 4]])
+print(mt.__dict__)
+
+mt2 = matrix + mt
+print(mt2.__dict__)
+
+mt3 = matrix + 10
+print(mt3.__dict__)
+
+mt4 = matrix - mt
+print(mt4.__dict__)
+
+mt5 = matrix - 10
+print(mt5.__dict__)
+
 
