@@ -399,3 +399,111 @@ for x in st:
 print(st[0])
 
 
+# Variant 2 - Balakirev
+class StackObj:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+    def __repr__(self):
+        return str(self.data)
+
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self.__last = None
+
+    def push_back(self, obj):
+        if self.top is None:
+            self.top = obj
+        else:
+            self.__last.next = obj
+        self.__last = obj
+
+    def push_front(self, obj):
+        if self.top is None:
+            self.__last = self.top = obj
+        else:
+            obj.next = self.top
+            self.top = obj
+
+    def __iter__(self):
+        h = self.top
+        while h:
+            yield h
+            h = h.next
+
+    def __len__(self):
+        return sum(1 for _ in self)
+
+    def _get_obj(self, indx):
+        if type(indx) != int or not (0 <= indx < len(self)):
+            raise IndexError('Неверный индекс')
+        for i, obj in enumerate(self):
+            if i == indx:
+                return obj
+
+    def __getitem__(self, item):
+        return self._get_obj(item).data
+
+    def __setitem__(self, key, value):
+        self._get_obj(key).data = value
+
+
+# Task 9
+class Cell:
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        # дописать сравнение с типом данных, записанных в type_data
+        if type(data) != int:
+            raise TypeError("неверный тип данных")
+        self.__data = data
+
+    def __repr__(self):
+        return str(self.data)
+
+
+class TableValues:
+    def __init__(self, rows, cols, type_data=int):
+        self.type_data = type_data
+        self.table_size = rows, cols
+        self.table = tuple(tuple(Cell(0) for _ in range(cols)) for _ in range(rows))
+
+    def __iter__(self):
+        for row in self.table:
+            yield row
+
+    def __check_indx(self, indx):
+        for k, k_max in zip(indx, self.table_size):
+            if type(k) != int or not (0 <= k < k_max):
+                raise IndexError('неверный индекс')
+
+    def __getitem__(self, item):
+        self.__check_indx(item)
+        i, j = item
+        return self.table[i][j].data
+
+    def __setitem__(self, key, value):
+        self.__check_indx(key)
+        i, j = key
+        self.table[i][j].data = value
+
+
+tv = TableValues(3, 3)
+print(tv.__dict__)
+tv[1, 2] = 555
+print(tv[0, 0])
+
+for row in tv:
+    for val in row:
+        print(val, end=' ')
+    print()
+
