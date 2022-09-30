@@ -96,6 +96,7 @@ class Valve(Product):
         self.PN = PN
 
 
+
 print(Product.__doc__)
 pr1 = Product()
 print(pr1.__dict__)
@@ -131,3 +132,10 @@ print(cart2)
 # как изменить порядок инициализации свойств в экземплярах дочерних классов?
 # описание продукта клапан (Valve(Product)) нужно сделать: name, type, DN, PN, art_code, bom
 
+# так не работает:
+# class Valve(Product):
+#     def __init__(self, name, DN, PN, art_code=None, bom=None):
+#         super().__init__(name)
+#         self.DN = DN
+#         self.PN = PN
+#         super().__init__(art_code, bom)
