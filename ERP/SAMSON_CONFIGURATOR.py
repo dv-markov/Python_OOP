@@ -14,20 +14,24 @@ class TPA:
 class Type3241(TPA):
     def __init__(self, valve_type, dn, pn, mat, kvs):
         super().__init__(valve_type, dn, pn, mat, kvs)
-        self.parts = dict.fromkeys(('Body', 'Seat', 'Plug'), [])
+        self.parts = {key: [] for key in ('Body', 'Seat', 'Plug')}
 
     def get_bom(self):
         for part in self.parts:
-            print(part)
-            tmp = []
+            # print(part)
+            # tmp = []
             for x in inventory:
                 if x.__class__.__name__ == part and all(self.params[p] in x.attrs[p] for p in x.attrs):
-                    tmp.append(x)
-            print(tmp)
-            self.parts[part] += tmp
+                    # print('x.__class__.__name__: ', x.__class__.__name__)
+                    # print('part: ', part)
+                    # tmp.append(x)
+                    # print(self.parts[part])
+                    self.parts[part].append(x)
+                    # print(self.parts[part])
+            # print(tmp)
+            # self.parts[part] += tmp
             # self.parts[part].append(x for x in inventory
             #                         if x.__class__.__name__ == part)
-
 
 
 class Part:
@@ -43,7 +47,7 @@ class Part:
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        return f'{self.__class__.__name__}: {self.art_nr}, {self.name} \n'
+        return f'\n{self.__class__.__name__}: {self.art_nr}, {self.name} \n'
 
 
 class Body(Part):
@@ -74,10 +78,10 @@ class Plug(Part):
 
 
 inventory = list()
-inventory.append(Body('Корпус DN50 PN40', 50, (16, 25, 40), ('20ГЛ', '1.0619', '1.6220')))
-inventory.append(Body('Корпус DN50 PN40', 50, (16, 25, 40), ('09Г2С', '1.0619', '1.6220')))
-inventory.append(Body('Корпус DN50 PN40', 50, (16, 25, 40), '1.0619'))
-inventory.append(Body('Корпус DN50 PN40', 50, (16, 25, 40), '1.6220'))
+inventory.append(Body('Корпус DN50 PN40 20ГЛ', 50, (16, 25, 40), ('20ГЛ', '1.0619', '1.6220')))
+inventory.append(Body('Корпус DN50 PN40 09Г2С', 50, (16, 25, 40), ('09Г2С', '1.0619', '1.6220')))
+inventory.append(Body('Корпус DN50 PN40 1.0619', 50, (16, 25, 40), '1.0619'))
+inventory.append(Body('Корпус DN50 PN40 1.6220', 50, (16, 25, 40), '1.6220'))
 inventory.append(Seat('Седло DN 32-50 Kvs10', (32, 40, 50), 10))
 inventory.append(Seat('Седло DN 32-50 Kvs16', (32, 40, 50), 16))
 inventory.append(Seat('Седло DN 32-50 Kvs25', (32, 40, 50), 25))
@@ -87,12 +91,13 @@ inventory.append(Plug('Плунжер DN 32-50 Kvs16 =%', (32, 40, 50), 16))
 # print(*(x.__dict__ for x in inventory), sep='\n')
 # print()
 
-# valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
-# print(valve_param)
-# for x in valve_param:
-#     valve_param[x] = input(f'Введите {x}: ')
-# print(valve_param)
-valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
+valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
+print(valve_param)
+for x in valve_param:
+    value = input(f'Введите {x}: ')
+    valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value
+print(valve_param)
+# valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
 
 v1 = Type3241(*valve_param.values())
 for item in inventory:
