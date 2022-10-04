@@ -47,7 +47,7 @@ class Part:
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        return f'\n{self.__class__.__name__}: {self.art_nr}, {self.name} \n'
+        return f'\n{self.__class__.__name__}: {self.art_nr}; {self.name} \n'
 
 
 class Body(Part):
@@ -92,12 +92,12 @@ inventory.append(Plug('Плунжер DN 32-50 Kvs16 =%', (32, 40, 50), 16))
 # print()
 
 valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
-print(valve_param)
-for x in valve_param:
-    value = input(f'Введите {x}: ')
-    valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value
-print(valve_param)
-# valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
+# print(valve_param)
+# for x in valve_param:
+#     value = input(f'Введите {x}: ')
+#     valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value
+# print(valve_param)
+valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
 
 v1 = Type3241(*valve_param.values())
 for item in inventory:
@@ -105,6 +105,6 @@ for item in inventory:
 print(v1.__dict__)
 
 v1.get_bom()
-print(v1.__dict__)
+print(v1.parts)
 
 

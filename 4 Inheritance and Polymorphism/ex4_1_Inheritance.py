@@ -125,3 +125,22 @@ table = Table("Круглый", 1024, 812.55, (700, 750, 700))
 book = ElBook("Python ООП", 2000, 2048, 'pdf')
 print(*table.get_data())
 print(*book.get_data())
+
+
+# Task 6
+class GenericView:
+    def __init__(self, methods=('GET',)):
+        self.methods = methods
+
+    def get(self, request):
+        return ""
+
+    def post(self, request):
+        pass
+
+    def put(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
