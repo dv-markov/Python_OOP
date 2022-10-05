@@ -35,7 +35,9 @@ class Part:
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        return f'\n{self.__class__.__name__}: {self.art_nr}; {self.name} \n'
+        # return f'\n{self.__class__.__name__}: {self.art_nr}; {self.name} \n'
+        # return f'\n    {self.art_nr}: {self.name} \n'
+        return f' {self.art_nr}: {self.name}'
 
 
 class Body(Part):
@@ -65,23 +67,31 @@ if __name__ == '__main__':
     inventory = fill_inventory()
 
     print('Доступные детали:')
-    # # print(*(x.__dict__ for x in inventory), sep='\n')
-    # # print()
     for item in inventory:
         print(item.__class__.__name__, item.__dict__)
-    #
-    #
-    # valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
-    # print(valve_param)
-    # for x in valve_param:
-    #     value = input(f'Введите {x}: ')
-    #     valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value
-    # print(valve_param)
-    # # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
-    #
-    # v1 = Type3241(*valve_param.values())
-    # print(v1.__dict__)
-    # v1.get_bom()
-    # print(v1.__dict__)
+    print()
 
+    valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
+    # print(valve_param)
+    for x in valve_param:
+        value = input(f'Введите {x}: ')
+        valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value.upper()
+    print('\n', 'Введены параметры клапана:', sep='')
+    print(valve_param)
+    # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
 
+    v1 = Type3241(*valve_param.values())
+    print('\n', 'Создан объект по шаблону "клапан 3241":', sep='')
+    print(v1.__dict__)
+
+    v1.get_bom()
+    print()
+    print(f'Подобраны подходящие детали для клапана конфигурации {v1.valve_type}',
+          *v1.params.values(), sep='-')
+    # print(v1.__dict__)
+    part_names1 = {'Body': 'КОРПУС', 'Bonnet': 'КРЫШКА', 'Seat': 'СЕДЛО'}
+    part_names2 = {'Body': 'корпуса', 'Bonnet': 'крышки', 'Seat': 'седла'}
+    for p in v1.parts:
+        print(f'{part_names1[p]}:')
+        print(*v1.parts[p], sep='\n') if len(v1.parts[p]) > 0 \
+            else print(f' Для данной конфигурации клапана доступные {part_names2[p]} не найдены!')
