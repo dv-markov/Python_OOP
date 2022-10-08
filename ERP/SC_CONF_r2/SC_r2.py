@@ -35,7 +35,7 @@ class Part:
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        return f' {self.art_nr}: {self.name}'
+        return f'{self.art_nr}: {self.name}'
 
 
 class Body(Part):
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             print('Доступные детали:')
             print(dashes(50))
             for item in inventory:
-                print(item, *(f'{atr_names[key]}: {value}' for key, value in item.attrs.items()), sep='; ')
+                print(item, *(f'{atr_names[key]}: {value}' for key, value in item.attrs.items()), sep=';\n--> ')
             print(dashes(50))
 
         elif s1 == '2':
@@ -153,8 +153,8 @@ if __name__ == '__main__':
 
             print(dashes(50))
             for p in v1.parts:
-                print(f'{part_names1[p]}:')
-                print(*v1.parts[p], sep='\n') if len(v1.parts[p]) > 0 \
+                print(f'{part_names1[p]}:', '\n ', end='')
+                print(*v1.parts[p], sep='\n ') if len(v1.parts[p]) > 0 \
                     else print(f' Для данной конфигурации клапана доступные {part_names2[p]} не найдены!')
             print(dashes(50))
 
