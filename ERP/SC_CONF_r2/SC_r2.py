@@ -62,9 +62,19 @@ class Seat(Part):
                       'mat': self.get_list(mat)}
 
 
+def invite_message():
+    print("""Выберите действие:
+1 - Задать конфигурацию клапана, 2 - Отобразить доступные детали, 0 - Выход""")
+    s = input("Введите цифру, соответствующую требуемому действию: ")
+
+
 if __name__ == '__main__':
     # заполнение склада
     inventory = fill_inventory()
+    print("""-----------------------------------------
+Конфигуратор Самсон Контролс, версия 0.2а
+-----------------------------------------""")
+    invite_message()
 
     print('Доступные детали:')
     for item in inventory:
@@ -72,18 +82,18 @@ if __name__ == '__main__':
     print()
 
     valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
-    # print(valve_param)
     for x in valve_param:
         value = input(f'Введите {x}: ')
         valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value.upper()
     print('\n', 'Введены параметры клапана:', sep='')
     print(valve_param)
-    # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 10}
+    # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 25}
 
     v1 = Type3241(*valve_param.values())
     print('\n', 'Создан объект по шаблону "клапан 3241":', sep='')
-    print(v1.__dict__)
+    print(v1.__dict__, '\n')
 
+    input('...Нажмите клавишу ВВОД для создания BOM...')
     v1.get_bom()
     print()
     print(f'Подобраны подходящие детали для клапана конфигурации {v1.valve_type}',
@@ -95,3 +105,5 @@ if __name__ == '__main__':
         print(f'{part_names1[p]}:')
         print(*v1.parts[p], sep='\n') if len(v1.parts[p]) > 0 \
             else print(f' Для данной конфигурации клапана доступные {part_names2[p]} не найдены!')
+    print()
+    input()
