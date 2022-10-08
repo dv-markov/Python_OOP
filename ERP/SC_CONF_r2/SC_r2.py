@@ -1,4 +1,4 @@
-# Конфигуратор Самсон Контролс-r1
+# Конфигуратор Самсон Контролс-r2
 from collections.abc import Iterable
 from inventory_fill import fill_inventory
 
@@ -35,8 +35,6 @@ class Part:
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        # return f'\n{self.__class__.__name__}: {self.art_nr}; {self.name} \n'
-        # return f'\n    {self.art_nr}: {self.name} \n'
         return f' {self.art_nr}: {self.name}'
 
 
@@ -63,47 +61,69 @@ class Seat(Part):
 
 
 def invite_message():
-    print("""Выберите действие:
-1 - Задать конфигурацию клапана, 2 - Отобразить доступные детали, 0 - Выход""")
-    s = input("Введите цифру, соответствующую требуемому действию: ")
+    def invite():
+        print()
+        print("Выберите действие и введите соответствующую цифру:", "\n",
+              "1 - Задать конфигурацию клапана, 2 - Отобразить доступные детали, 0 - Выход")
+
+        return input("> ")
+
+    s = invite()
+    while s not in ('1', '2', '0'):
+        print('Ошибка ввода!')
+        s = invite()
+
+    return s
+
+
+def dashes(n):
+    return '-' * n
 
 
 if __name__ == '__main__':
-    # заполнение склада
-    inventory = fill_inventory()
-    print("""-----------------------------------------
-Конфигуратор Самсон Контролс, версия 0.2а
------------------------------------------""")
-    invite_message()
-
-    print('Доступные детали:')
-    for item in inventory:
-        print(item.__class__.__name__, item.__dict__)
-    print()
-
-    valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
-    for x in valve_param:
-        value = input(f'Введите {x}: ')
-        valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value.upper()
-    print('\n', 'Введены параметры клапана:', sep='')
-    print(valve_param)
-    # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 25}
-
-    v1 = Type3241(*valve_param.values())
-    print('\n', 'Создан объект по шаблону "клапан 3241":', sep='')
-    print(v1.__dict__, '\n')
-
-    input('...Нажмите клавишу ВВОД для создания BOM...')
-    v1.get_bom()
-    print()
-    print(f'Подобраны подходящие детали для клапана конфигурации {v1.valve_type}',
-          *v1.params.values(), sep='-')
-    # print(v1.__dict__)
+    title = "Конфигуратор Самсон Контролс, версия 0.2а"
+    print(dashes(len(title)), title, dashes(len(title)), sep='\n')
+    # текстовые переменные
     part_names1 = {'Body': 'КОРПУС', 'Bonnet': 'КРЫШКА', 'Seat': 'СЕДЛО'}
     part_names2 = {'Body': 'корпуса', 'Bonnet': 'крышки', 'Seat': 'седла'}
-    for p in v1.parts:
-        print(f'{part_names1[p]}:')
-        print(*v1.parts[p], sep='\n') if len(v1.parts[p]) > 0 \
-            else print(f' Для данной конфигурации клапана доступные {part_names2[p]} не найдены!')
-    print()
-    input()
+    # заполнение склада
+    inventory = fill_inventory()
+
+    s1 = invite_message()
+    while s1 != '0':
+        print()
+
+        if s1 == '2':
+            print('Доступные детали:')
+            print(dashes(50))
+            for item in inventory:
+                print(item.__class__.__name__, item.__dict__)
+            print(dashes(50))
+
+        elif s1 == '1':
+            valve_param = dict.fromkeys(('тип клапана', 'DN', 'PN', 'материал корпуса', 'Kvs'), None)
+            for x in valve_param:
+                value = input(f'Введите {x}: ')
+                valve_param[x] = int(value) if x in ('DN', 'PN', 'Kvs') else value.upper()
+            print('\n', 'Введены параметры клапана:', sep='')
+            print(valve_param)
+            # valve_param = {'тип клапана': 3241, 'DN': 50, 'PN': 40, 'материал корпуса': '20ГЛ', 'Kvs': 25}
+
+            v1 = Type3241(*valve_param.values())
+            print('\n', 'Создан объект по шаблону "клапан 3241":', sep='')
+            print(v1.__dict__, '\n')
+
+            input('...Нажмите клавишу ВВОД для создания BOM...')
+            v1.get_bom()
+            print()
+            print(f'Подобраны подходящие детали для клапана конфигурации {v1.valve_type}',
+                  *v1.params.values(), sep='-')
+
+            print(dashes(50))
+            for p in v1.parts:
+                print(f'{part_names1[p]}:')
+                print(*v1.parts[p], sep='\n') if len(v1.parts[p]) > 0 \
+                    else print(f' Для данной конфигурации клапана доступные {part_names2[p]} не найдены!')
+            print(dashes(50))
+
+        s1 = invite_message()
