@@ -144,3 +144,30 @@ class GenericView:
     def delete(self, request):
         pass
 
+
+class DetailView(GenericView):
+    def render_request(self, request, method):
+        if method not in self.methods:
+            raise TypeError('данный запрос не может быть выполнен')
+        # return getattr(self, method.lower())(request)
+
+        # Balakilrev
+        # f = getattr(self, method.lower(), False)
+        # if f:
+        #     return f(request)
+
+    def get(self, request):
+        if type(request) != dict:
+            raise TypeError('request не является словарем')
+        if 'url' not in request:
+            raise TypeError('request не содержит обязательного ключа url')
+        return f"url: {request['url']}"
+
+
+dv = DetailView()
+html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')   # url: https://site.ru/home
+print(html)
+
+
+
+
