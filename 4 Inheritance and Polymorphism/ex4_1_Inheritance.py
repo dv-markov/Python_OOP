@@ -149,7 +149,7 @@ class DetailView(GenericView):
     def render_request(self, request, method):
         if method not in self.methods:
             raise TypeError('данный запрос не может быть выполнен')
-        # return getattr(self, method.lower())(request)
+        return getattr(self, method.lower())(request)
 
         # Balakilrev
         # f = getattr(self, method.lower(), False)
@@ -169,5 +169,46 @@ html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')   # url: https:
 print(html)
 
 
+# Task 7
+# здесь Singleton работает отдельно для базового класса и отдельно для каждого из дочерних
+class Singleton:
+    __instance = None
+    __instance_base = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls == Singleton:
+            if cls.__instance_base is None:
+                cls.__instance_base = super().__new__(cls)
+            return cls.__instance_base
+
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
 
+# первый вариант
+class Game(Singleton):
+    def __init__(self, name):
+        if 'name' not in self.__dict__:
+            self.name = name
+
+
+# второй вариант
+class Game2(Singleton):
+    def __init__(self, name):
+        if not hasattr(self, 'name'):
+            self.name = name
+
+
+a0 = Singleton()
+a1 = Game(1)
+a2 = Game(2)
+a3 = Game(3)
+print(a1.__dict__)
+print(a2.__dict__)
+print(a3.__dict__)
+
+g1 = Game2('one')
+g2 = Game2('two')
+print(g1.__dict__)
+print(g2.__dict__)
