@@ -165,7 +165,7 @@ class DetailView(GenericView):
 
 
 dv = DetailView()
-html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')   # url: https://site.ru/home
+html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')  # url: https://site.ru/home
 print(html)
 
 
@@ -212,3 +212,74 @@ g1 = Game2('one')
 g2 = Game2('two')
 print(g1.__dict__)
 print(g2.__dict__)
+
+
+# Task 8
+class Validator:
+    def _is_valid(self, data):
+        return True
+
+    def __call__(self, *args, **kwargs):
+        if not self._is_valid(args[0]):
+            raise ValueError('данные не прошли валидацию')
+
+
+class IntegerValidator(Validator):
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        return type(data) == int and self.min_value <= data <= self.max_value
+
+
+class FloatValidator(Validator):
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        return type(data) == float and self.min_value <= data <= self.max_value
+
+
+v = Validator()
+print(v(123))
+
+integer_validator = IntegerValidator(-10, 10)
+float_validator = FloatValidator(-1, 1)
+res1 = integer_validator(10)  # исключение не генерируется (проверка проходит)
+# res2 = float_validator(10)  # исключение ValueError
+
+# Variant 2
+# class Validator:
+#     def _is_valid(self, data):
+#         return True
+#
+#     def __call__(self, data):
+#         if self._is_valid(data):
+#             return True
+#         else:
+#             raise ValueError('данные не прошли валидацию')
+#
+#
+# class ExtValidator(Validator):
+#     data_type = None
+#
+#     def __init__(self, min_value, max_value):
+#         self.min_value = min_value
+#         self.max_value = max_value
+#
+#     def _is_valid(self, data):
+#         return type(data) == self.data_type \
+#                and self.min_value <= data <= self.max_value
+#
+#
+# class IntegerValidator(ExtValidator):
+#     data_type = int
+#
+#
+# class FloatValidator(ExtValidator):
+#     data_type = float
+
+
+# Task 9
