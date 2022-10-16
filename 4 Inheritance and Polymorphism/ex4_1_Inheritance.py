@@ -283,3 +283,62 @@ res1 = integer_validator(10)  # исключение не генерируетс
 
 
 # Task 9
+class Layer:
+    def __init__(self):
+        self.next_layer = None
+        self.name = 'Layer'
+
+    def __call__(self, *args, **kwargs):
+        self.next_layer = args[0]
+        return args[0]
+
+
+class Input(Layer):
+    def __init__(self, inputs: int):
+        super().__init__()
+        self.name = 'Input'
+        self.inputs = inputs
+
+
+class Dense(Layer):
+    def __init__(self, inputs: int, outputs: int, activation: str):
+        super().__init__()
+        self.name = 'Dense'
+        self.inputs = inputs
+        self.outputs = outputs
+        self.activation = activation
+
+
+class NetworkIterator:
+    def __init__(self, nw):
+        self.nw = nw
+
+    def __iter__(self):
+        n = self.nw
+        while n:
+            yield n
+            n = n.next_layer
+
+# Variant 2
+# Определение имени по имени класса, прописывается в базовом классе
+# self.name = self._class__.__name__
+
+
+print()
+first_layer = Layer()
+next_layer = first_layer(Layer())
+next_layer = next_layer(Layer())
+for x in NetworkIterator(first_layer):
+    print(x.name)
+
+print()
+network = Input(128)
+layer = network(Dense(network.inputs, 1024, 'linear'))
+layer = layer(Dense(layer.inputs, 10, 'softmax'))
+for x in NetworkIterator(network):
+    print(x.name)
+
+
+# Task 10
+class Vector:
+    pass
