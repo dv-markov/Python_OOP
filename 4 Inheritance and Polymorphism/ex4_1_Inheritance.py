@@ -340,5 +340,76 @@ for x in NetworkIterator(network):
 
 
 # Task 10
+from operator import add, sub
+
+
 class Vector:
-    pass
+    def __init__(self, *coords):
+        self.coords = coords
+
+    def __eq__(self, other):
+        return len(self.coords) == len(other.coords)
+
+    def _check_len(self, other):
+        if self != other:
+            raise TypeError('размерности векторов не совпадают')
+
+    def _operate(self, other, op):
+        self._check_len(other)
+        return __class__(*(op(x, y) for x, y in zip(self.coords, other.coords)))
+
+    def __add__(self, other):
+        return self._operate(other, add)
+
+    def __sub__(self, other):
+        return self._operate(other, sub)
+
+    def get_coords(self):
+        return self.coords
+
+
+class VectorInt(Vector):
+    def __init__(self, *coords):
+        if not self.__check_int(coords):
+            raise ValueError('координаты должны быть целыми числами')
+        super().__init__(*coords)
+
+    @staticmethod
+    def __check_int(coords):
+        return all(type(x) == int for x in coords)
+
+    def _operate(self, other, op):
+        self._check_len(other)
+        return self.__class__(*(op(x, y) for x, y in zip(self.coords, other.coords)))
+
+    def __add__(self, other):
+        if self.__check_int(other.coords):
+            return self._operate(other, add)
+        return super()._operate(other, add)
+
+    def __sub__(self, other):
+        if self.__check_int(other.coords):
+            return self._operate(other, sub)
+        return super()._operate(other, sub)
+
+
+v = Vector(1, 2, 3)
+print(v.__dict__)
+
+v1 = Vector(1, 2, 3)
+v2 = Vector(3, 4, 5)
+v = v1 + v2  # формируется новый вектор (объект класса Vector) с соответствующими координатами
+print(v.coords)
+v = v1 - v2  # формируется новый вектор (объект класса Vector) с соответствующими координатами
+print(v.coords)
+
+v3 = VectorInt(1, 2, 3, 4)
+print(v3.__dict__)
+# v = VectorInt(1, 0.2, 3, 4) # ошибка: генерируется исключение
+v4 = Vector(8, 7, 6, 5)
+print(v4.__dict__)
+v = v3 + v4
+print(type(v), v.coords)
+v = v3 - v4
+print(type(v), v.coords)
+
