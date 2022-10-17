@@ -413,3 +413,122 @@ print(type(v), v.coords)
 v = v3 - v4
 print(type(v), v.coords)
 
+# Variant 2
+# from operator import add, sub
+#
+# class Vector:
+#     type_coords = (int, float)
+#     error_message = 'числами'
+#
+#     def __init__(self, *args):
+#         self.__check_data(args)
+#         self.coords = [*args]
+#
+#     def get_coords(self):
+#         return tuple(self.coords)
+#
+#     def __check_data(self, lst):
+#         if not all(type(x) in self.type_coords for x in lst):
+#             raise ValueError(f'координаты должны быть {self.error_message}')
+#
+#     def __len__(self):
+#         return len(self.coords)
+#
+#     def __check_vector(self, other):
+#         if len(self) != len(other):
+#             raise TypeError('размерности векторов не совпадают')
+#
+#     def __make_calc(self, other, op) -> list:
+#         self.__check_vector(other)
+#         return [op(*el) for el in zip(self.coords, other.coords)]
+#
+#     @staticmethod
+#     def make_vector(lst):
+#         try:
+#             return VectorInt(*lst)
+#         except ValueError:
+#             return Vector(*lst)
+#
+#     def __add__(self, other):
+#         res = self.__make_calc(other, add)
+#         return self.make_vector(res)
+#
+#     def __sub__(self, other):
+#         res = self.__make_calc(other, sub)
+#         return self.make_vector(res)
+#
+#
+# class VectorInt(Vector):
+#     type_coords = (int, )
+#     error_message = 'целыми числами'
+
+
+# Variant 3
+
+
+class Vector:
+    def __init__(self, *coords):
+        self.coords = coords
+
+    def __eq__(self, other):
+        return len(self.coords) == len(other.coords)
+
+    def _check_len(self, other):
+        if self != other:
+            raise TypeError('размерности векторов не совпадают')
+
+    def _operate(self, other, op, int_values=False):
+        self._check_len(other)
+        class_level = self.__class__ if int_values else __class__
+        return class_level(*(op(x, y) for x, y in zip(self.coords, other.coords)))
+
+    def __add__(self, other):
+        return self._operate(other, add)
+
+    def __sub__(self, other):
+        return self._operate(other, sub)
+
+    def get_coords(self):
+        return self.coords
+
+
+class VectorInt(Vector):
+    def __init__(self, *coords):
+        if not self.__check_int(coords):
+            raise ValueError('координаты должны быть целыми числами')
+        super().__init__(*coords)
+
+    @staticmethod
+    def __check_int(coords):
+        return all(type(x) == int for x in coords)
+
+    def __add__(self, other):
+        if self.__check_int(other.coords):
+            return self._operate(other, add, True)
+        return self._operate(other, add)
+
+    def __sub__(self, other):
+        if self.__check_int(other.coords):
+            return self._operate(other, sub, True)
+        return self._operate(other, sub)
+
+
+v = Vector(1, 2, 3)
+print(v.__dict__)
+
+v1 = Vector(1, 2, 3)
+v2 = Vector(3, 4, 5)
+v = v1 + v2  # формируется новый вектор (объект класса Vector) с соответствующими координатами
+print(v.coords)
+v = v1 - v2  # формируется новый вектор (объект класса Vector) с соответствующими координатами
+print(v.coords)
+
+v3 = VectorInt(1, 2, 3, 4)
+print(v3.__dict__)
+# v = VectorInt(1, 0.2, 3, 4) # ошибка: генерируется исключение
+v4 = Vector(8, 7, 6, 5.1)
+print(v4.__dict__)
+v = v3 + v4
+print(type(v), v.coords)
+v = v3 - v4
+print(type(v), v.coords)
