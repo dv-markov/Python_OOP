@@ -227,3 +227,138 @@ print()
 for y in lst_mammals:
     print(y.name)
 print()
+
+
+# Task 6
+class Tuple(tuple):
+    def __add__(self, other):
+        return Tuple(super().__add__(tuple(other)))
+
+
+iter_obj = [1, 2, 3]
+t1 = Tuple(iter_obj)
+print(t1)
+t2 = t1 + iter_obj  # создается новый объект класса Tuple с новым (соединенным) набором данных
+print(t2.__class__, t2)
+t3 = t2 + {4, 5, 6}
+print(t3)
+t4 = Tuple({7, 8, 9})
+print(t4)
+
+t = Tuple([1, 2, 3])
+t = t + "Python"
+print(t)   # (1, 2, 3, 'P', 'y', 't', 'h', 'o', 'n')
+t = (t + "Python") + "ООП"
+print(t)
+
+
+# Task 7
+class VideoItem:
+    def __init__(self, title: str, descr: str, path: str):
+        self.title = title
+        self.descr = descr
+        self.path = path
+        self.rating = VideoRating()
+
+
+class VideoRating:
+    def __init__(self):
+        self.rating = 0
+
+    @property
+    def rating(self):
+        return self.__rating
+
+    @rating.setter
+    def rating(self, value):
+        if type(value) != int or not (0 <= value <= 5):
+            raise ValueError('неверное присваиваемое значение')
+        self.__rating = value
+
+
+v = VideoItem('Курс по Python ООП', 'Подробный курс по Python ООР', 'D:/videos/python_oop.mp4')
+print(v.rating.rating) # 0
+v.rating.rating = 5
+print(v.rating.rating) # 5
+title = v.title
+descr = v.descr
+# v.rating.rating = 6  # ValueError
+
+
+# Task 9 - итератор по атрибутам
+# Version 1 - my
+# class IteratorAttrs:
+#     def __init__(self):
+#         self.attrs = tuple(self.__dict__)
+#         self.ln_attrs = len(self.attrs)
+#
+#     def __iter__(self):
+#         self.indx = -1
+#         return self
+#
+#     def __next__(self):
+#         if self.indx < self.ln_attrs - 1:
+#             self.indx += 1
+#             v = self.attrs[self.indx]
+#             return v, getattr(self, v)
+#         raise StopIteration
+
+
+# Version 2 - my
+# class IteratorAttrs:
+#     def __init__(self):
+#         self.attrs = tuple(self.__dict__)
+#
+#     def __iter__(self):
+#         for k in self.attrs:
+#             yield k, getattr(self, k)
+
+
+# Version 3 - my refined
+class IteratorAttrs:
+    def __iter__(self):
+        for attr in self.__dict__.items():
+            yield attr
+
+
+class SmartPhone(IteratorAttrs):
+    def __init__(self, model: str, size: tuple, memory: int):
+        self.model = model
+        self.size = size
+        self.memory = memory
+        # super().__init__()
+
+
+phone = SmartPhone('iPhone', (100, 200), 128)
+for attr, value in phone:
+    print(attr, value)
+
+for attr, value in phone:
+    print(attr, value)
+
+for x in phone:
+    print(x)
+
+
+# Version 3 - Vladislav Smolov
+# class IteratorAttrs:
+#     def __iter__(self):
+#         return iter(self.__dict__.items())
+
+# Version 4 - Дмитрий Суднищиков
+# class IteratorAttrs:
+#     def __iter__(self):
+#         yield from self.__dict__.items()
+
+# Version 5 - YouTube - Юрий Качанов
+# class IteratorAttrs:
+#     def __iter__(self):
+#         self.step = -1
+#         return self
+#
+#     def __next__(self):
+#         self.step += 1
+#         if self.step < len(self.__dict__) - 1:
+#             return list(self.__dict__.items())[self.step]
+#         raise StopIteration
+
