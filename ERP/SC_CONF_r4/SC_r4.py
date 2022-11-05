@@ -1,18 +1,19 @@
-# Загрузка структуры объекта из файла excel
+# Загрузка структуры объекта и перечня компонентов из файла excel
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from dataclasses import dataclass
+from collections.abc import Iterable
 
-wb = load_workbook("config.xlsx", read_only=True)
+wb = load_workbook("config.xlsx", read_only=True, data_only=True)
 print(wb.sheetnames)
 # ws = wb.active
-ws = wb['Structure']
+ws = wb['Templates']
 # ws = wb[wb.sheetnames[0]]
 
 # решение через фактические значения ячеек
 wsl2 = tuple(tuple(cell.value for cell in row) for row in ws)
-wb.close()
+# wb.close()
 print(wsl2)
 row_indx = 0
 while wsl2[row_indx][0] != '#':
@@ -25,7 +26,7 @@ print(wsl)
 
 
 # @dataclass()
-class ValvePart:
+class ValvePartTemplate:
     def __init__(self, level, name, parent=None):
         self.level = level
         self.name = name
@@ -65,7 +66,7 @@ for row in wsl:
     r = row[0].strip() if row[0] else ''
     if '#' in r:
         level = r.count('#')
-        vp = ValvePart(level, row[1].strip())
+        vp = ValvePartTemplate(level, row[1].strip())
 
         if row[2]:
             params = row[2].strip()
@@ -86,10 +87,52 @@ for row in wsl:
 
 print(valve_list)
 
+
 # загрузка доступных деталей
+class Part:
+    def __init__(self, tp, art_nr, name, attrs=None):
+        self.tp = tp
+        self.art_nr = art_nr
+        self.name = name
+        self.attrs = attrs
+
+    @staticmethod
+    def get_list(value):
+        return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
+
+    def __repr__(self):
+        return f'{self.art_nr}: {self.name}'
+
+
 inventory = []
 
+if not all(valve.name in wb.sheetnames for valve in valve_list):
+    raise IndexError('Файл не содержит листа с именем соответствующим наименованию ТПА')
+print(*(v.name for v in valve_list))
 
+# дописать с учетом иерархии компонентов
+parts = list(valve_list[0].bom)
+print(parts)
+
+# добавление всех деталей из листа с именем клапана в список inventory
+for valve in valve_list:
+    ws = wb[valve.name]
+    wsl2 = tuple(tuple(cell.value for cell in row) for row in ws)
+    print(wsl2)
+    wsl = [row for row in wsl2 if row[0] in parts]
+    print(wsl)
+
+    for row in wsl:
+        pt = Part(row[0], row[1], row[2])
+        inventory.append(pt)
+
+    for p in valve.bom:
+        pass
+
+print(*(f'{v.art_nr} {v.name}' for v in inventory), sep='\n')
+
+
+wb.close()
 
 
 
