@@ -91,7 +91,7 @@ print(valve_list)
 # загрузка доступных деталей
 class Part:
     def __init__(self, tp, art_nr, name, attrs=None):
-        self.tp = tp
+        self.type = tp
         self.art_nr = art_nr
         self.name = name
         self.attrs = attrs
@@ -117,20 +117,26 @@ print(parts)
 # добавление всех деталей из листа с именем клапана в список inventory
 for valve in valve_list:
     ws = wb[valve.name]
-    wsl2 = tuple(tuple(cell.value for cell in row) for row in ws)
-    print(wsl2)
-    wsl = [row for row in wsl2 if row[0] in parts]
+    print(ws.max_row)
+    wsl = tuple(tuple(cell.value for cell in row) for row in ws if row[0].value)
+    print(len(wsl))
+    # print(wsl2)
+    # # wsl = [row for row in wsl2 if row[0] in parts]
+    # wsl = wsl2[:-1]
     print(wsl)
 
-    for row in wsl:
-        pt = Part(row[0], row[1], row[2])
-        inventory.append(pt)
+    for row in wsl[1:]:
+        part = Part(row[0], row[1], row[2])
+        part.attrs = dict(valve.bom[part.type].params)
+        for attr in part.attrs:
+            indx = wsl[0].index(attr)
+            value = row[indx]
+            part.attrs[attr] = value.split('; ') if isinstance(value, str) else [value]
 
-    for p in valve.bom:
-        pass
+        inventory.append(part)
 
-print(*(f'{v.art_nr} {v.name}' for v in inventory), sep='\n')
 
+print(*(f'{v.art_nr} {v.name} {v.attrs}' for v in inventory), sep='\n')
 
 wb.close()
 
