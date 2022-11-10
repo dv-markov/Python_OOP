@@ -90,8 +90,8 @@ print(valve_list)
 
 # загрузка доступных деталей
 class Part:
-    def __init__(self, tp, art_nr, name, attrs=None):
-        self.type = tp
+    def __init__(self, part_type, art_nr, name, valve_type=None, attrs=None):
+        self.part_type = part_type
         self.art_nr = art_nr
         self.name = name
         self.attrs = attrs
@@ -111,8 +111,8 @@ if not all(valve.name in wb.sheetnames for valve in valve_list):
 print(*(v.name for v in valve_list))
 
 # дописать с учетом иерархии компонентов
-parts = list(valve_list[0].bom)
-print(parts)
+# parts = list(valve_list[0].bom)
+# print(parts)
 
 # добавление всех деталей из листа с именем клапана в список inventory
 for valve in valve_list:
@@ -126,19 +126,44 @@ for valve in valve_list:
     print(wsl)
 
     for row in wsl[1:]:
-        part = Part(row[0], row[1], row[2])
-        part.attrs = dict(valve.bom[part.type].params)
+        part = Part(row[0], row[1], row[2], valve)
+        part.attrs = dict(valve.bom[part.part_type].params)
         for attr in part.attrs:
             indx = wsl[0].index(attr)
             value = row[indx]
-            part.attrs[attr] = value.split('; ') if isinstance(value, str) else [value]
+            part.attrs[attr] = value.split('; ') if isinstance(value, str) else [str(value)]
 
         inventory.append(part)
-
+    print(f'Детали ТПА {valve.name} успешно загружены из файла')
 
 print(*(f'{v.art_nr} {v.name} {v.attrs}' for v in inventory), sep='\n')
-
 wb.close()
+
+
+# начало работы с пользователем
+def invite_message():
+    def invite():
+        print()
+        print("Введите одну из указанных ниже цифр для выполнения соответствующего действия:", "\n",
+              "1 - Задать конфигурацию клапана, 2 - Отобразить доступные параметры клапана, "
+              "3 - Отобразить доступные детали, 0 - Выход")
+        return input("> ")
+
+    s = invite()
+    while s not in ('1', '2', '3', '0'):
+        print('Ошибка ввода!')
+        s = invite()
+    return s
+
+
+def dashes(n):
+    return '-' * n
+
+
+if __name__ == '__main__':
+    title = "Конфигуратор Самсон Контролс, версия 0.4а"
+    print(dashes(len(title)), title, dashes(len(title)), sep='\n')
+
 
 
 

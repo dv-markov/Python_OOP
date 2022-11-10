@@ -26,16 +26,17 @@ class Type3241(TPA):
 
 
 class Part:
-    def __init__(self, art_nr, name):
+    def __init__(self, art_nr, name, attrs=None):
         self.art_nr = art_nr
         self.name = name
+        self.attrs = attrs
 
     @staticmethod
     def get_list(value):
         return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
 
     def __repr__(self):
-        return f'{self.art_nr}: {self.name}'
+        return f'{self.art_nr}: {self.name}, {self.attrs}'
 
 
 class Body(Part):
@@ -106,6 +107,9 @@ if __name__ == '__main__':
             avl_params[atr_names[attr]].update(values)
     avl_params['тип клапана'] = {'3241', }
     avl_params['PN'] = {25, 40}
+
+    # просмотр склада
+    print(*inventory, sep='\n')
 
     # начало работы с пользователем
     s1 = invite_message()
