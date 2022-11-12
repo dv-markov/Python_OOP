@@ -285,6 +285,7 @@ class Router:
         cls.app[path] = func
 
 
+# Декоратор на уровне класса
 class Callback:
     def __init__(self, path, route_cls):
         self.path = path
@@ -294,6 +295,12 @@ class Callback:
         self.route_cls.add_callback(self.path, func)
 
 
+# Здесь передается ссылка на сам класс Router.
+# Когда мы вызываем класс, как декоратор, создается экземпляр этого класса, вызывается инициализатор.
+# При декорировании функции (применении класса-декоратора к функции),
+# после вызова инициализатора, автоматически происходит вызов метода call из класса-декоратора,
+# аргумент - декорируемая функция
+# Декоратор фактически будет делать то, что прописано в методе call
 @Callback('/', Router)
 def index():
     return '<h1>Главная</h1>'
@@ -303,3 +310,73 @@ route = Router.get('/')
 if route:
     ret = route()
     print(ret)
+
+
+# Task 7
+# функция-декоратор для методов класса
+# вызывается только для объектов "callable", то есть функций и методов
+def integer_params_decorated(v):
+    def wrapper(*args):
+        if not all(map(lambda x: isinstance(x, int) or isinstance(x, Vector), args)):
+            raise TypeError("аргументы должны быть целыми числами")
+        return v(*args)
+
+    return wrapper
+
+
+def integer_params(cls):
+    methods = {k: v for k, v in cls.__dict__.items() if callable(v)}
+    for k, v in methods.items():
+        setattr(cls, k, integer_params_decorated(v))
+
+    return cls
+
+
+@integer_params
+class Vector:
+    def __init__(self, *args):
+        self.__coords = list(args)
+
+    def __getitem__(self, item):
+        return self.__coords[item]
+
+    def __setitem__(self, key, value):
+        self.__coords[key] = value
+
+    def set_coords(self, *coords, reverse=False):
+        c = list(coords)
+        self.__coords = c if not reverse else c[::-1]
+
+
+vector = Vector(1, 2)
+vector[0] = 500
+print(vector[0], vector[1])
+print(vector.__dict__)
+print(Vector.__dict__)
+# vector[1] = 20.4 # TypeError
+
+
+# Variant 2 - Balakirev
+# def integer_params_decorated(func):
+#     def wrapper(self, *args, **kwargs):
+#         if not all(type(x) == int for x in args):
+#             raise TypeError("аргументы должны быть целыми числами")
+#         if not all(type(x) == int for x in kwargs.values()):
+#             raise TypeError("аргументы должны быть целыми числами")
+#         return func(*args)
+#     return wrapper
+
+
+# Task 8
+class SoftList(list):
+    def __getitem__(self, item):
+        if item > len(self) - 1 or item < -len(self):
+            return False
+        return super().__getitem__(item)
+
+
+sl = SoftList("python")
+print(sl[0]) # 'p'
+print(sl[-1]) # 'n'
+print(sl[6]) # False
+print(sl[-7]) # False
