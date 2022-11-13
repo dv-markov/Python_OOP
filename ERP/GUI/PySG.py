@@ -8,6 +8,7 @@ sg.theme('Kayak')
 
 EXCEL_FILE = 'Data_Entry.xlsx'
 df = pd.read_excel(EXCEL_FILE)
+print(df)
 
 layout = [
     [sg.Text('Please fill out the following fields:')],

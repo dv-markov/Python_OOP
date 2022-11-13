@@ -5,6 +5,8 @@ from openpyxl import Workbook, load_workbook
 # from openpyxl.utils import get_column_letter
 # from dataclasses import dataclass
 import PySimpleGUI as sg
+from datetime import datetime
+
 
 wb = load_workbook("config.xlsx", read_only=True, data_only=True)
 print(wb.sheetnames)
@@ -179,23 +181,58 @@ if __name__ == '__main__':
         [sg.Text('Конфигуратор Самсон Контролс', size=(40, 2))],
         [sg.Text('')],
         [sg.Text('Выберите тип и параметры клапана')],
-        [sg.Text('Тип клапана', size=(15, 1)), sg.Combo(list(x.name for x in valve_list), key='valve_type'),
+        [sg.Text('Тип клапана', size=(15, 1)), sg.Combo(list(x.name for x in valve_list), size=(20, 1), key='valve_type'),
          sg.Button('OK')]
     ]
 
     for key, value in general_valve_parameters['Клапан тип 3241'].items():
-        layout.append([sg.Text(key, size=(15, 1)), sg.Combo(value, key=key)])
+        layout.append([sg.Text(key, size=(15, 1)), sg.Combo(value, size=(20, 1), key=key)])
 
     window = sg.Window('Конфигуратор Самсон Контролс v0.5a', layout)
 
+    wb = Workbook()
+    ws = wb.active
+    ws.title = valve_list[0].name
+    # ws.column_dimensions['A'].width = 85
+    # ws.column_dimensions['B'].width = 165
+    # ws.column_dimensions['C'].width = 640
+    # ws.column_dimensions['D'].width = 1500
+
+    n = 0
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
         print(values)
-        # for key, value in general_valve_parameters[values['valve_type']].items():
-        #     layout.append([sg.Text(key), sg.Combo(value, key=key)])
+        print(values.get('valve_type'))
+        valve_bom = {k: [] for k in valve_list[0].bom}
+        # print(valve_list)
+        # valve_bom = {k: [] for k in valve_list.get[values.get('valve_type')].bom}
+        print(valve_bom)
 
+        for part in inventory:
+            if all(values[p] in part.attrs[p] for p in part.attrs):
+                valve_bom[part.part_type].append(part)
+
+        n += 1
+        # ws.append([n] + list(values.values()))
+        header = list(values.values())
+        ws.append([n] + [header[0]] + ['-'.join(header[1:])])
+        for key, value in valve_bom.items():
+            print(key)
+            ws.append([key])
+            print(*(f'{v.art_nr} {v.name} {v.attrs}' for v in value), sep='\n')
+            for v in value:
+                ws.append(['']+[v.art_nr, v.name, str(v.attrs)])
+        ws.append([])
+
+    for column_cells in ws.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        ws.column_dimensions[column_cells[0].column_letter].width = length
+
+    now = datetime.now()
+    dt = now.strftime("%Y%m%d-%H%M%S")
+    wb.save(f"BOM {dt}.xlsx")
     window.close()
 
 
