@@ -2,9 +2,9 @@
 VERSION = '0.5a'
 
 from openpyxl import Workbook, load_workbook
-from openpyxl.utils import get_column_letter
-from dataclasses import dataclass
-from collections.abc import Iterable
+# from openpyxl.utils import get_column_letter
+# from dataclasses import dataclass
+import PySimpleGUI as sg
 
 wb = load_workbook("config.xlsx", read_only=True, data_only=True)
 print(wb.sheetnames)
@@ -97,10 +97,6 @@ class Part:
         self.name = name
         self.attrs = attrs
 
-    @staticmethod
-    def get_list(value):
-        return list(value) if isinstance(value, Iterable) and type(value) != str else [value]
-
     def __repr__(self):
         return f'{self.art_nr}: {self.name}'
 
@@ -176,6 +172,34 @@ if __name__ == '__main__':
     print(dashes(len(title)), title, dashes(len(title)), sep='\n')
     print()
     print(general_valve_parameters)
+
+    sg.theme('Kayak')
+
+    layout = [
+        [sg.Text('Конфигуратор Самсон Контролс', size=(40, 2))],
+        [sg.Text('')],
+        [sg.Text('Выберите тип и параметры клапана')],
+        [sg.Text('Тип клапана', size=(15, 1)), sg.Combo(list(x.name for x in valve_list), key='valve_type'),
+         sg.Button('OK')]
+    ]
+
+    for key, value in general_valve_parameters['Клапан тип 3241'].items():
+        layout.append([sg.Text(key, size=(15, 1)), sg.Combo(value, key=key)])
+
+    window = sg.Window('Конфигуратор Самсон Контролс v0.5a', layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
+        print(values)
+        # for key, value in general_valve_parameters[values['valve_type']].items():
+        #     layout.append([sg.Text(key), sg.Combo(value, key=key)])
+
+    window.close()
+
+
+
 
 
 

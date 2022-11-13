@@ -4,3 +4,9 @@
 /ERP/ERP.zip
 /ERP/SC_CONF_r3/~$config.xlsx
 /ERP/SC_CONF_r3/NewGrades.xlsx
+/ERP/GUI/build/
+/ERP/GUI/dist/
+/ERP/GUI/data_entry.spec
+/ERP/GUI/PySG.spec
+/ERP/GUI/data-entry-form-pysimplegui-master.zip
+/ERP/GUI/PySG.exe
