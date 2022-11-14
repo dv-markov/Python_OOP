@@ -1,0 +1,1 @@
+pyinstaller --onefile --noconsole --icon=samson.ico SC_r5.py
