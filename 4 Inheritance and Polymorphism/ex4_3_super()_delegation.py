@@ -400,26 +400,6 @@ class StringDigit(str):
         return self.__class__(super().__add__(other))
 
     def __radd__(self, other):
-        # self.__check_is_digits(other)
-        # return self.__class__(super().__add__(other + self))
-        other = self.__class__(other)
-        return other + self
-
-
-class StringDigit(str):
-    def __init__(self, string):
-        self.__check_is_digits(string)
-
-    @staticmethod
-    def __check_is_digits(string):
-        if not set(string).issubset(digits):
-            raise ValueError('В строке должны быть только цифры')
-
-    def __add__(self, other):
-        self.__check_is_digits(other)
-        return self.__class__(super().__add__(other))
-
-    def __radd__(self, other):
         return self.__class__(other) + self
 
 
