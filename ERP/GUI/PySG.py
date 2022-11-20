@@ -1,5 +1,8 @@
 import PySimpleGUI as sg
 import pandas as pd
+from ctypes import windll
+
+windll.shcore.SetProcessDpiAwareness(1)
 
 # Add color scheme to the window
 sg.theme('Kayak')

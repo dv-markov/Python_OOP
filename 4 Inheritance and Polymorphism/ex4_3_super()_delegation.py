@@ -376,7 +376,83 @@ class SoftList(list):
 
 
 sl = SoftList("python")
-print(sl[0]) # 'p'
-print(sl[-1]) # 'n'
-print(sl[6]) # False
-print(sl[-7]) # False
+print(sl[0])  # 'p'
+print(sl[-1])  # 'n'
+print(sl[6])  # False
+print(sl[-7])  # False
+
+
+# Task 9
+from string import digits
+
+
+class StringDigit(str):
+    def __init__(self, string):
+        self.__check_is_digits(string)
+
+    @staticmethod
+    def __check_is_digits(string):
+        if not set(string).issubset(digits):
+            raise ValueError('В строке должны быть только цифры')
+
+    def __add__(self, other):
+        self.__check_is_digits(other)
+        return self.__class__(super().__add__(other))
+
+    def __radd__(self, other):
+        # self.__check_is_digits(other)
+        # return self.__class__(super().__add__(other + self))
+        other = self.__class__(other)
+        return other + self
+
+
+class StringDigit(str):
+    def __init__(self, string):
+        self.__check_is_digits(string)
+
+    @staticmethod
+    def __check_is_digits(string):
+        if not set(string).issubset(digits):
+            raise ValueError('В строке должны быть только цифры')
+
+    def __add__(self, other):
+        self.__check_is_digits(other)
+        return self.__class__(super().__add__(other))
+
+    def __radd__(self, other):
+        return self.__class__(other) + self
+
+
+sd = StringDigit('123')
+print(sd, type(sd))
+sd = sd + '456'
+print(sd, type(sd))
+sd = '789' + sd
+print(sd, type(sd))
+# sd1 = StringDigit('ads')
+
+
+# Task 10
+class ItemAttrs:
+    def __getitem__(self, item):
+        attrs_lst = list(self.__dict__)
+        return getattr(self, attrs_lst[item])
+
+    def __setitem__(self, key, value):
+        attrs_lst = list(self.__dict__)
+        setattr(self, attrs_lst[key], value)
+
+
+class Point(ItemAttrs):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+pt = Point(1, 2.5)
+x = pt[0]
+y = pt[1]
+print(x, y)
+pt[0] = 10
+print(pt.__dict__)
+

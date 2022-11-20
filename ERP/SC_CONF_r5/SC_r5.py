@@ -7,6 +7,9 @@ from openpyxl.styles import Font
 # from dataclasses import dataclass
 import PySimpleGUI as sg
 from datetime import datetime
+from ctypes import windll
+
+windll.shcore.SetProcessDpiAwareness(1)
 
 VERSION = '0.5a'
 
@@ -170,11 +173,13 @@ def invite_message():
 def dashes(n):
     return '-' * n
 
+
 def styled_cells(data):
     for c in data:
         c = Cell(ws, column="A", row=1, value=c)
         c.font = Font(bold=True)
         yield c
+
 
 if __name__ == '__main__':
     title = "Конфигуратор Самсон Контролс, версия " + VERSION
@@ -210,8 +215,10 @@ if __name__ == '__main__':
     n = 0
     while True:
         event, values = window.read()
+
         if event == sg.WIN_CLOSED or event == 'Выход':
             break
+
         if event == 'OK':
             print(values)
             print(values.get('valve_type'))
@@ -225,7 +232,6 @@ if __name__ == '__main__':
                     valve_bom[part.part_type].append(part)
 
             n += 1
-            # ws.append([n] + list(values.values()))
             header = list(values.values())
             header_line = [n] + [header[0]] + ['-'.join(header[1:])]
             ws.append(styled_cells(header_line))
@@ -245,6 +251,7 @@ if __name__ == '__main__':
     now = datetime.now()
     dt = now.strftime("%Y%m%d-%H%M%S")
     wb.save(f"BOM {dt}.xlsx")
+
     window.close()
 
 
