@@ -316,9 +316,9 @@ class Subject:
 
 class Data:
     def __init__(self, temp, press, wet):
-        self.temp = temp    # температура
+        self.temp = temp  # температура
         self.press = press  # давление
-        self.wet = wet      # влажность
+        self.wet = wet  # влажность
 
 
 class TemperatureView(Observer):
@@ -352,6 +352,8 @@ subject.change_data(Data(23, 150, 83))
 # Текущая влажность 83
 subject.remove_observer(wet)
 subject.change_data(Data(24, 148, 80))
+
+
 # выведет строчки:
 # Текущая температура 24
 # Текущее давление 148
@@ -383,3 +385,91 @@ subject.change_data(Data(24, 148, 80))
 
 
 # Task 7
+class Aircraft:
+    def __init__(self, model, mass, speed, top):
+        self._verify_str(model)
+        self._verify_positive_number(mass, speed, top)
+        self._model = model
+        self._mass = mass
+        self._speed = speed
+        self._top = top
+
+    @staticmethod
+    def _err():
+        raise TypeError('неверный тип аргумента')
+
+    def _verify_str(self, s):
+        if not isinstance(s, str):
+            self._err()
+
+    def _verify_positive_number(self, *args):
+        if not all(type(x) in (int, float) and x > 0 for x in args):
+            self._err()
+
+    def _verify_positive_int(self, i):
+        if not isinstance(i, int) or i < 0:
+            self._err()
+
+
+class PassengerAircraft(Aircraft):
+    def __init__(self, model, mass, speed, top, chairs):
+        super().__init__(model, mass, speed, top)
+        self._verify_positive_int(chairs)
+        self._chairs = chairs
+
+
+class WarPlane(Aircraft):
+    def __init__(self, model, mass, speed, top, weapons):
+        super().__init__(model, mass, speed, top)
+        self._verify_weapons(weapons)
+        self._weapons = weapons
+
+    def _verify_weapons(self, w):
+        if not isinstance(w, dict):
+            self._err()
+        for k, v in w.items():
+            self._verify_str(k)
+            self._verify_positive_int(v)
+
+
+planes = [
+    PassengerAircraft('МС-21', 1250, 8000, 12000.5, 140),
+    PassengerAircraft('SuperJet', 1145, 8640, 11034, 80),
+    WarPlane('Миг-35', 7034, 25000, 2000, {"ракета": 4, "бомба": 10}),
+    WarPlane('Су-35', 7034, 34000, 2400, {"ракета": 4, "бомба": 7})
+]
+
+for p in planes:
+    print(p.__dict__)
+
+
+# Variant 2 - Константин Мамонов
+# class Aircraft:
+#     def __init__(self, model, mass, speed, top):
+#         self.chek(model, str)
+#         self._model = model
+#         [self.chek(i, (int, float)) for i in (mass, speed, top)]
+#         self._mass = mass
+#         self._speed = speed
+#         self._top = top
+#
+#     @staticmethod
+#     def chek(value, type_value):
+#         if not isinstance(value, type_value):
+#             raise TypeError('неверный тип аргумента')
+#         if type(value) in (int, float) and value < 0:
+#             raise TypeError('неверный тип аргумента')
+#
+#
+# class PassengerAircraft(Aircraft):
+#     def __init__(self, model, mass, speed, top, chairs):
+#         super().__init__(model, mass, speed, top)
+#         self.chek(chairs, int)
+#         self._chairs = chairs
+#
+#
+# class WarPlane(Aircraft):
+#     def __init__(self, model, mass, speed, top, weapons):
+#         super().__init__(model, mass, speed, top)
+#         self.chek(weapons, dict)
+#         self._weapons = weapons
