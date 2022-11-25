@@ -473,3 +473,63 @@ for p in planes:
 #         super().__init__(model, mass, speed, top)
 #         self.chek(weapons, dict)
 #         self._weapons = weapons
+
+
+# Task 9
+# def class_log(cls):
+#     # methods = {k: v for k, v in cls.__dict__ if callable(v)}
+#     # for k in methods
+#     #     pass
+#     vector_log.append(k for k, v in cls.__dict__ if callable(v))
+#     return cls
+
+# def class_log_decorated(func):
+#     def wrapper(*args):
+#         return func(*args)
+#     return wrapper
+#
+#
+# def class_log(cls):
+#     methods = {k: v for k, v in cls.__dict__.items() if callable(v)}
+#     for k, v in methods.items():
+#         print(k)
+#         setattr(cls, k, class_log_decorated(v))
+#     return cls
+
+
+def method_decorator(func_name, func, lst):
+    def wrapper(*args):
+        lst.append(func_name)
+        return func(*args)
+    return wrapper
+
+
+def class_log(lst):
+    def class_decorator(cls):
+        # lst.extend([k for k, v in cls.__dict__.items() if callable(v)])
+        methods = {k: v for k, v in cls.__dict__.items() if callable(v)}
+        for k, v in methods.items():
+            setattr(cls, k, method_decorator(k, v, lst))
+        return cls
+    return class_decorator
+
+
+vector_log = []   # наименование (vector_log) в программе не менять!
+
+
+@class_log(vector_log)
+class Vector:
+    def __init__(self, *args):
+        self.__coords = list(args)
+
+    def __getitem__(self, item):
+        return self.__coords[item]
+
+    def __setitem__(self, key, value):
+        self.__coords[key] = value
+
+
+print(Vector.__dict__)
+vec = Vector(1, 2, 3)
+vec[0] = 10
+print(vector_log)
