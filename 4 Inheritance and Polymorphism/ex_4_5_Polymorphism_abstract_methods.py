@@ -341,3 +341,50 @@ reviewer.set_mark(students[1], 3)
 
 for p in persons + students:
     print(p)
+
+
+# Task 4
+class ShopInterface:
+    def get_id(self):
+        raise NotImplementedError('в классе не переопределен метод get_id')
+
+
+class ShopItem(ShopInterface):
+    def __init__(self, name: str, weight: float, price: float):
+        self._name = name
+        self._weight = weight
+        self._price = price
+        self.__id = hash((name, weight, price))
+
+    def get_id(self):
+        return self.__id
+
+
+si = ShopItem('phone', 200, 100_000)
+print(si.get_id())
+
+
+# Task 5
+class Validator:
+    def _is_valid(self, data):
+        raise NotImplementedError('в классе не переопределен метод _is_valid')
+
+
+class FloatValidator(Validator):
+    def __init__(self, min_value, max_value):
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def _is_valid(self, data):
+        return isinstance(data, float) and self.min_value <= data <= self.max_value
+
+    def __call__(self, value):
+        return self._is_valid(value)
+
+
+float_validator = FloatValidator(0, 10.5)
+print(res_1 := float_validator(1))  # False (целое число, а не вещественное)
+print(res_2 := float_validator(1.0))  # True
+print(res_3 := float_validator(-1.0))  # False (выход за диапазон [0; 10.5])
+
+
