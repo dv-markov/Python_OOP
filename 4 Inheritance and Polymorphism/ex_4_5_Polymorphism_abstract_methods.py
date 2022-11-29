@@ -388,3 +388,53 @@ print(res_2 := float_validator(1.0))  # True
 print(res_3 := float_validator(-1.0))  # False (выход за диапазон [0; 10.5])
 
 
+# Task 6
+from abc import ABC, abstractmethod
+
+
+class Transport(ABC):
+    @abstractmethod
+    def go(self):
+        """Метод для перемещения транспортного средства"""
+
+    @classmethod
+    @abstractmethod
+    def abstract_class_method(cls):
+        """Абстрактный метод класса"""
+
+
+class Bus(Transport):
+    def __init__(self, model, speed):
+        self._model = model
+        self._speed = speed
+
+    def go(self):
+        print("bus go")
+
+    @classmethod
+    def abstract_class_method(cls):
+        pass
+
+#######################
+
+class Model(ABC):
+    @abstractmethod
+    def get_pk(self):
+        """Абстрактный метод класса Model"""
+
+    def get_info(self):
+        return "Базовый класс Model"
+
+
+class ModelForm(Model):
+    def __init__(self, login, password):
+        self._login = login
+        self._password = password
+        self._id = hash(login)
+
+    def get_pk(self):
+        return self._id
+
+
+form = ModelForm("Логин", "Пароль")
+print(form.get_pk())
