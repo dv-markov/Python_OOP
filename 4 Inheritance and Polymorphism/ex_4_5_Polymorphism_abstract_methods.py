@@ -438,3 +438,147 @@ class ModelForm(Model):
 
 form = ModelForm("Логин", "Пароль")
 print(form.get_pk())
+
+
+# Task 7
+class StackInterface (ABC):
+    @abstractmethod
+    def push_back(self, obj):
+        """Абстрактный метод класса StackInterface для добавления объекта в конец стека"""
+
+    @abstractmethod
+    def pop_back(self):
+        """Абстрактный метод класса StackInterface для удаления последнего объекта из стека"""
+
+
+class Stack(StackInterface):
+    def __init__(self):
+        self._top = None
+
+    def push_back(self, obj):
+        if self._top is None:
+            self._top = obj
+        else:
+            tmp = self._top
+            while tmp._next:
+                tmp = tmp._next
+            tmp._next = obj
+
+    def pop_back(self):
+        if self._top is None:
+            return None
+        elif self._top._next is None:
+            tmp = self._top
+            self._top = None
+            return tmp
+        else:
+            tmp = self._top
+            while tmp._next._next:
+                tmp = tmp._next
+            tmp2 = tmp._next
+            tmp._next = None
+            return tmp2
+
+
+class StackObj:
+    def __init__(self, data):
+        self._data = data
+        self._next = None
+
+
+st = Stack()
+st.push_back(StackObj("obj 1"))
+obj = StackObj("obj 2")
+st.push_back(obj)
+del_obj = st.pop_back() # del_obj - ссылка на удаленный объект (если объектов не было, то del_obj = None)
+
+print(del_obj)
+
+# Variant 2 - Stanislav Glinkin
+# class Stack(StackInterface):
+#     def __init__(self):
+#         self._top = None
+#
+#     def __iter__(self):
+#         h = self._top
+#         while h:
+#             yield h
+#             h = h.next
+#
+#     def push_back(self, obj: StackObj):
+#         if not self._top:
+#             self._top = obj
+#             return
+#         *_, last = self
+#         last.next = obj
+#
+#     def pop_back(self):
+#         if not self._top:
+#             return None
+#         if not self._top.next:
+#             obj = self._top
+#             self._top = None
+#             return obj
+#         *_, p_last, last = self
+#         p_last.next = None
+#         return last
+
+
+# Task 8
+class CountryInterface(ABC):
+    name: str
+    population: int
+    square: int
+    @property
+    @abstractmethod
+    def name(self):
+        """Объект-свойство name абстрактного класса"""
+
+    @property
+    @abstractmethod
+    def population(self):
+        """Объект-свойство populaiton абстрактного класса"""
+
+    @property
+    @abstractmethod
+    def square(self):
+        """Объект-свойство square абстрактного класса"""
+
+
+class Country(CountryInterface):
+    def __init__(self, name, population, square):
+        self.__name = name
+        self.__population = population
+        self.__square = square
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def population(self):
+        return self.__population
+
+    @population.setter
+    def population(self, value):
+        self.__population = value
+
+    @property
+    def square(self):
+        return self.__square
+
+    @square.setter
+    def square(self, value):
+        self.__square = value
+
+    def get_info(self):
+        return f"{self.name}: {self.square}, {self.population}"
+
+
+country = Country("Россия", 140000000, 324005489.55)
+name = country.name
+pop = country.population
+country.population = 150000000
+country.square = 354005483.0
+print(country.get_info()) # Россия: 354005483.0, 150000000
+
