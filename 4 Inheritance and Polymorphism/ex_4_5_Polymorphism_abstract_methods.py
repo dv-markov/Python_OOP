@@ -582,3 +582,97 @@ country.population = 150000000
 country.square = 354005483.0
 print(country.get_info()) # Россия: 354005483.0, 150000000
 
+
+# Task 9
+class Track:
+    def __init__(self, *args):
+        self.__points = []
+        if all(self.__verify_point_track(x) for x in args):
+            self.__points.extend(args)
+        elif all(type(x) in (int, float) for x in args) and len(args) == 2:
+            self.__points.append(PointTrack(args[0], args[1]))
+        else:
+            raise TypeError('Аргументы должны быть объектами класса PointTrack или числами')
+
+    @property
+    def points(self):
+        return tuple(self.__points)
+
+    @staticmethod
+    def __verify_point_track(pt):
+        return isinstance(pt, PointTrack)
+
+    def add_back(self, pt):
+        if self.__verify_point_track(pt):
+            self.__points.append(pt)
+
+    def add_front(self, pt):
+        if self.__verify_point_track(pt):
+            self.__points.insert(0, pt)
+
+    def pop_back(self):
+        if len(self.points) > 0:
+            return self.__points.pop()
+
+    def pop_front(self):
+        if len(self.points) > 0:
+            return self.__points.pop(0)
+
+
+class PointTrack:
+    def __init__(self, x, y):
+        self.__verify_coords(x, y)
+        self.x = x
+        self.y = y
+
+    @staticmethod
+    def __verify_coords(*coords):
+        if not all(type(x) in (int, float) for x in coords):
+            raise TypeError('координаты должны быть числами')
+
+    def __str__(self):
+        return f"PointTrack: {self.x}, {self.y}"
+
+
+pt = PointTrack(1, 2)
+print(pt) # PointTrack: 1, 2
+
+tr = Track(PointTrack(0, 0), PointTrack(1.2, -0.5), PointTrack(2.4, -1.5))
+tr.add_back(PointTrack(1.4, 0))
+print(tr.pop_front())
+for pt in tr.points:
+    print(pt)
+
+
+# Task 10
+class Food:
+    def __init__(self, name: str, weight: float, calories: float):
+        self._name = name
+        self._weight = weight
+        self._calories = calories
+
+
+class BreadFood(Food):
+    def __init__(self, name, weight, calories, white: bool):
+        super().__init__(name, weight, calories)
+        self._white = white
+
+
+class SoupFood(Food):
+    def __init__(self, name, weight, calories, dietary: bool):
+        super().__init__(name, weight, calories)
+        self._dietary = dietary
+
+
+class FishFood(Food):
+    def __init__(self, name, weight, calories, fish: str):
+        super().__init__(name, weight, calories)
+        self._fish = fish
+
+
+bf = BreadFood("Бородинский хлеб", 34.5, 512, False)
+sf = SoupFood("Черепаший суп", 520, 890.5, False)
+ff = FishFood("Консерва рыбная", 340, 1200, "семга")
+for food in bf, sf, ff:
+    print(food.__dict__)
+
