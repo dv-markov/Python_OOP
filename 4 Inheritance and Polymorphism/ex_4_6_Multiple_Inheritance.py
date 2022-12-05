@@ -181,3 +181,124 @@ class NoteBook(Goods, MixinLog2, MixinLog):
 
 n = NoteBook('Monster', 1.8, 30_000)
 n.print_info()
+
+
+# Способ сделать так, чтобы родительские классы наследовались вне зависимости от порядка указания
+class A:
+    def __init__(self, name, old):
+        super().__init__()
+        self.name = name
+        self.old = old
+
+
+class B:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class C(B, A):
+    def __init__(self, name, old, weight, height):
+        super().__init__(name, old)
+        self.weight = weight
+        self.height = height
+
+
+person = C("Balakirev", 33, 80, 185)
+print(person.__dict__)
+
+
+print("""
+Задачи""")
+
+
+# Task 4
+class Digit:
+    ALLOWED_TYPES = int, float
+
+    def __init__(self, value):
+        self._verify_number(value)
+        self.value = value
+
+    def _verify_number(self, value):
+        if type(value) not in self.ALLOWED_TYPES:
+            self._err()
+
+    def _err(self):
+        raise TypeError('значение не соответствует типу объекта')
+
+
+class Integer(Digit):
+    ALLOWED_TYPES = int,
+
+
+class Float(Digit):
+    ALLOWED_TYPES = float,
+
+
+class Positive(Digit):
+    def _verify_number(self, value):
+        super()._verify_number(value)
+        if value <= 0:
+            self._err()
+
+
+class Negative(Digit):
+    def _verify_number(self, value):
+        super()._verify_number(value)
+        if value >= 0:
+            self._err()
+
+
+class PrimeNumber(Integer, Positive):
+    pass
+
+
+class FloatPositive(Float, Positive):
+    pass
+
+
+# i = Negative(-100)
+# print(i.__dict__)
+
+PN = (10, 37, 800)
+FP = (21.123, 13.45, 123.247, 4564.234, 0.1)
+digits = [PrimeNumber(x) for x in PN] + [FloatPositive(y) for y in FP]
+lst_positive = list(filter(lambda x: isinstance(x, Positive), digits))
+lst_float = list(filter(lambda x: isinstance(x, Float), digits))
+
+for v in lst_positive + lst_float:
+    print(v.__dict__)
+
+
+# Variant 2 - Евгений Вохмин
+# class Digit:
+#     def __init__(self, value):
+#         self._value = value
+#
+#     def __setattr__(self, name, value):
+#         if not self._check_value(value):
+#             raise TypeError('значение не соответствует типу объекта')
+#         super().__setattr__(name, value)
+#
+#     def _check_value(self, value):
+#         return type(value) in (int, float)
+#
+#
+# class Integer(Digit):
+#     def _check_value(self, value):
+#         return super()._check_value(value) and type(value) is int
+#
+#
+# class Float(Digit):
+#     def _check_value(self, value):
+#         return super()._check_value(value) and type(value) is float
+#
+#
+# class Positive(Digit):
+#     def _check_value(self, value):
+#         return super()._check_value(value) and value > 0
+#
+#
+# class Negative(Digit):
+#     def _check_value(self, value):
+#         return super()._check_value(value) and value < 0
