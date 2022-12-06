@@ -302,3 +302,55 @@ for v in lst_positive + lst_float:
 # class Negative(Digit):
 #     def _check_value(self, value):
 #         return super()._check_value(value) and value < 0
+
+
+# Task 5
+class ShopItem:
+    ID_SHOP_ITEM = 0
+
+    def __init__(self):
+        super().__init__()
+        ShopItem.ID_SHOP_ITEM += 1
+        self._id = ShopItem.ID_SHOP_ITEM
+
+    def get_pk(self):
+        return self._id
+
+
+class ShopGenericView:
+    def __repr__(self):
+        return "\n".join(f"{k}: {v}" for k, v, in self.__dict__.items())
+
+
+class ShopUserView:
+    def __repr__(self):
+        return "\n".join(f"{k}: {v}" for k, v, in tuple(self.__dict__.items())[1:])
+
+
+class Book(ShopItem, ShopUserView):
+    def __init__(self, title, author, year):
+        super().__init__()
+        self._title = title
+        self._author = author
+        self._year = year
+
+
+book = Book("Python ООП", "Балакирев", 2022)
+print(book)
+
+
+# Variant 2 -
+# class ShopGenericView:
+#     def __iter__(self):
+#         for i in self.__dict__.items():
+#             yield i
+#
+#     def __str__(self):
+#         return '\n'.join(map(lambda x: f'{x[0]}: {x[1]}', self))
+#
+# class ShopUserView(ShopGenericView):
+#     def __iter__(self):
+#         for data in list(self.__dict__.items())[1::]:
+#             yield data
+
+
