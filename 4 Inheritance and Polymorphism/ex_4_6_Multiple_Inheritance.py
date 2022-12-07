@@ -354,3 +354,102 @@ print(book)
 #             yield data
 
 
+# Task 8
+class RetriveMixin:
+    def get(self, request):
+        return "GET: " + request.get('url')
+
+
+class CreateMixin:
+    def post(self, request):
+        return "POST: " + request.get('url')
+
+
+class UpdateMixin:
+    def put(self, request):
+        return "PUT: " + request.get('url')
+
+
+class GeneralView:
+    allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+    def render_request(self, request):
+        method = request.get('method')
+        if method not in self.allowed_methods:
+            raise TypeError(f"Метод {method} не разрешен.")
+        return getattr(self, method.lower())(request)
+
+
+class DetailView(RetriveMixin, GeneralView):
+    allowed_methods = ('GET', 'PUT', )
+
+
+view = DetailView()
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'GET'})
+print(html)   # GET: https://stepik.org/course/116336/
+# html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'PUT'})
+# print(html)   # AttributeError: 'DetailView' object has no attribute 'put'
+
+
+class DetailView(RetriveMixin, UpdateMixin, GeneralView):
+    allowed_methods = ('GET', 'PUT', )
+
+
+view = DetailView()
+html = view.render_request({'url': 'https://stepik.org/course/116336/', 'method': 'PUT'})
+print(html)
+
+
+# Task 9
+class MoneyOperators:
+    def __add__(self, other):
+        if type(other) in (int, float):
+            return self.__class__(self.money + other)
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+
+        return self.__class__(self.money + other.money)
+
+    def __sub__(self, other):
+        if type(other) in (int, float):
+            return self.__class__(self.money - other)
+
+        if type(self) != type(other):
+            raise TypeError('Разные типы объектов')
+
+        return self.__class__(self.money - other.money)
+
+
+class Money:
+    def __init__(self, value):
+        if type(value) not in (int, float):
+            raise TypeError('сумма должна быть числом')
+        self._money = value
+
+    @property
+    def money(self):
+        return self._money
+
+    @money.setter
+    def money(self, value):
+        self._money = value
+
+
+class MoneyR(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyR: {self.money}"
+
+
+class MoneyD(Money, MoneyOperators):
+    def __str__(self):
+        return f"MoneyD: {self.money}"
+
+
+m1 = MoneyR(1)
+m2 = MoneyD(2)
+m = m1 + 10
+print(m)  # MoneyR: 11
+m = m1 - 5.4
+print(m)
+# m = m1 + m2  # TypeError
