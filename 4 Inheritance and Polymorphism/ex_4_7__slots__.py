@@ -313,8 +313,7 @@ class Notes:
         return cls.__instance
 
     def __init__(self):
-        note_dict = {k: v for k, v, in zip(self.__slots__, Note.get_note_names())}
-        for k, v in note_dict.items():
+        for k, v in zip(self.__slots__, Note.get_note_names()):
             setattr(self, k, Note(v))
 
     def __verify_index(self, indx):
