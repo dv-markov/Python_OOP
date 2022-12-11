@@ -237,3 +237,110 @@ print(id(s_system), id(s_system2))
 
 
 # Task 6
+class Star:
+    __slots__ = ('_name', '_massa', '_temp')
+
+    def __init__(self, name: str, massa: float, temp: float):
+        self._name = name
+        self._massa = massa
+        self._temp = temp
+
+
+class StarInterface(Star):
+    __slots__ = ('_type_star', '_radius')
+
+    def __init__(self, name: str, massa: float, temp: float, type_star: str, radius: float):
+        super().__init__(name, massa, temp)
+        self._type_star = type_star
+        self._radius = radius
+
+
+class WhiteDwarf(StarInterface):
+    __slots__ = ()
+
+
+class YellowDwarf(StarInterface):
+    __slots__ = ()
+
+
+class RedGiant(StarInterface):
+    __slots__ = ()
+
+
+class Pulsar(StarInterface):
+    __slots__ = ()
+
+
+stars = [RedGiant('Альдебаран', 5, 3600, 'красный гигант', 45),
+         WhiteDwarf('Сириус А', 2.1, 9250, 'белый карлик', 2),
+         WhiteDwarf('Сириус B', 1, 8200, 'белый карлик', 0.01),
+         YellowDwarf('Солнце', 1, 6000, 'желтый карлик', 1)
+         ]
+
+white_dwarfs = list(filter(lambda x: isinstance(x, WhiteDwarf), stars))
+
+print(len(white_dwarfs))
+for x in white_dwarfs:
+    print(x._name)
+
+
+# Task 7
+class Note:
+    __allowed_values = {'_name': ('до', 'ре', 'ми', 'фа', 'соль', 'ля', 'си'),
+                        '_ton': (-1, 0, 1)}
+
+    def __init__(self, name, ton=0):
+        self._name = name
+        self._ton = ton
+
+    def __setattr__(self, key, value):
+        if value not in self.__allowed_values.get(key, tuple()):
+            raise ValueError('недопустимое значение аргумента')
+        super().__setattr__(key, value)
+
+    @classmethod
+    def get_note_names(cls):
+        return cls.__allowed_values.get('_name')
+
+
+class Notes:
+    __slots__ = '_do', '_re', '_mi', '_fa', '_solt', '_la', '_si'
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    def __init__(self):
+        note_dict = {k: v for k, v, in zip(self.__slots__, Note.get_note_names())}
+        for k, v in note_dict.items():
+            setattr(self, k, Note(v))
+
+    def __verify_index(self, indx):
+        if not (0 <= indx <= (len(self.__slots__) - 1)):
+            raise IndexError('недопустимый индекс')
+
+    def __getitem__(self, item):
+        self.__verify_index(item)
+        return getattr(self, self.__slots__[item])
+
+    def __setitem__(self, key, value):
+        self.__verify_index(key)
+        setattr(self, self.__slots__[key], value)
+
+
+note = Note('до', 0)
+print(note.__dict__)
+print(note.get_note_names())
+
+notes = Notes()
+print(notes.__slots__)
+for n in notes.__slots__:
+    x = getattr(notes, n)
+    print(f'{x._name}, {x._ton}')
+
+nota = notes[2]  # ссылка на ноту ми
+notes[3]._ton = -1 # изменение тональности ноты фа
+
+
