@@ -1,4 +1,5 @@
 # 4.8 Испытание "Бремя наследия"
+from math import inf
 
 class Vertex:
     def __init__(self):
@@ -14,8 +15,8 @@ class Link:
         self._v1 = v1
         self._v2 = v2
         self._dist = dist
-        self.set_vector_record(v1)
-        self.set_vector_record(v2)
+        self.set_vertex_record(v1)
+        self.set_vertex_record(v2)
 
     @property
     def v1(self):
@@ -33,7 +34,7 @@ class Link:
     def dist(self, value):
         self._dist = value
 
-    def set_vector_record(self, v):
+    def set_vertex_record(self, v):
         if self not in v.links:
             v.links.append(self)
 
@@ -59,35 +60,90 @@ class LinkedGraph:
             self.add_vertex(link.v2)
 
     def find_path(self, start_v, stop_v):
-        # создать матрицу смежности
-        v_number = len(self._vertex)
-        adj_matrix = [[None for _ in range(v_number)] for _ in range(v_number)]
-        print(adj_matrix)
-        for i, v1 in enumerate(self._vertex):
-            # adj_matrix[i][i] = 0
-            # print(v1.links)
-            v1_edges = {edge.get_2nd_vertex(v1): edge.dist for edge in v1.links}
-            print(v1_edges)
-            # for j, v2 in enumerate(self._vertex[(i+1):]):
-            for j, v2 in enumerate(self._vertex):
-                adj_matrix[i][j] = v1_edges.get(v2, 0)
-        # adj_matrix[v_number-1][v_number-1] = 0
-        return adj_matrix
+        def get_adjacency_matrix():
+            # создание матрицы смежности
+            v_number = len(self._vertex)
+            adj_matrix = [[None for _ in range(v_number)] for _ in range(v_number)]
+            print(*adj_matrix, sep='\n')
+            for i, v1 in enumerate(self._vertex):
+                v1_edges = {edge.get_2nd_vertex(v1): edge.dist for edge in v1.links}
+                print(v1_edges)
+                for j, v2 in enumerate(self._vertex):
+                    adj_matrix[i][j] = v1_edges.get(v2, 0)
+            return adj_matrix
 
-# преобразование треугольной матрицы в симметричную
-# for i in range(num_rows):
-#     for j in range(i, num_cols):
-#         matrix[j][i] = matrix[i][j]
+        def get_link_v(v, D):
+            for i, weight in enumerate(D[v]):
+                if weight > 0:
+                    yield i
+
+        def arg_min(T, S):
+            amin = -1
+            m = max(T)
+            for i, t in enumerate(T):
+                if t < m and i not in S:
+                    m = t
+                    amin = i
+
+            return amin
+
+        D = get_adjacency_matrix()
+
+        N = len(D)  # число вершин в графе
+        T = [inf] * N  # последняя строка в таблице
+        print(T)
+
+        v0 = 1
+        v = v0  # стартовая вершина (нумерация с нуля)
+        S = {v}  # множество просмотренных вершин
+        T[v] = 0  # нулевой вес для стартовой вершины
+        print(T)
+
+        while v != -1:  # цикл пока не просмотрим все вершины
+            for j in get_link_v(v, D):  # перебираем все связанные вершины
+                if j not in S:  # если вершина еще не просмотрена
+                    w = T[v] + D[v][j]
+                    if w < T[j]:
+                        T[j] = w
+
+            v = arg_min(T, S)  # выбираем следующий узел с минимальным весом
+            if v != v0:  # выбрана новая вершина, в оригинале было v > 0
+                S.add(v)  # добавляем вершину в множество просмотренных
+
+        print(f'Вектор весов для вершины {v0}: {T}')
+        return D
 
 
+# # test_my_example
+# lg = LinkedGraph()
+# v_list = [Vertex() for _ in range(3)]
+# link_list = [Link(v_list[0], v_list[1], 1), Link(v_list[1], v_list[2], 2), Link(v_list[0], v_list[2], 5)]
+# for lnk in link_list:
+#     print(f'{lnk}: {lnk.v1}, {lnk.v2}, {lnk.dist}')
+#     lg.add_link(lnk)
+# # print(lg._links)
+# # print(lg._vertex)
+#
+# print(*lg.find_path(v_list[0], v_list[2]), sep='\n')
+
+
+# Balakirev https://www.youtube.com/watch?v=MCfjc_UIP1M&t=708s
 lg = LinkedGraph()
-v_list = [Vertex() for _ in range(3)]
-link_list = [Link(v_list[0], v_list[1], 1), Link(v_list[1], v_list[2], 2), Link(v_list[0], v_list[2], 5)]
-for link in link_list:
-    print(f'{link}: {link.v1}, {link.v2}, {link.dist}')
-    lg.add_link(link)
-# print(lg._links)
-# print(lg._vertex)
+v_list = [Vertex() for _ in range(6)]
+link_list = [Link(v_list[0], v_list[1], 3),
+             Link(v_list[0], v_list[2], 1),
+             Link(v_list[0], v_list[3], 3),
+             Link(v_list[1], v_list[2], 4),
+             Link(v_list[2], v_list[4], 7),
+             Link(v_list[2], v_list[5], 5),
+             Link(v_list[3], v_list[5], 2),
+             Link(v_list[5], v_list[4], 4)]
+for lnk in link_list:
+    print(f'{lnk}: {lnk.v1}, {lnk.v2}, {lnk.dist}')
+    lg.add_link(lnk)
 
-print(lg.find_path(v_list[0], v_list[2]))
+print(*lg.find_path(v_list[0], v_list[2]), sep='\n')
+
+
+
 
