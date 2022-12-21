@@ -41,6 +41,13 @@ class Link:
     def get_2nd_vertex(self, v):
         return self.v2 if v is self.v1 else self.v1
 
+    # def get_vertices(self):
+    #     return {self.v1, self.v2}
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return {self.v1, self.v2} == {other.v1, other.v2}
+
 
 class LinkedGraph:
     def __init__(self):
@@ -54,12 +61,15 @@ class LinkedGraph:
             #     self.add_link(l)
 
     def add_link(self, link):
-        if link not in self._links:
+        if all(map(lambda x: x != link, self._links)):
             self._links.append(link)
             self.add_vertex(link.v1)
             self.add_vertex(link.v2)
 
     def find_path(self, start_v, stop_v):
+        found_vertices = []
+        found_links = []
+
         def get_adjacency_matrix():
             # создание матрицы смежности
             v_number = len(self._vertex)
@@ -70,6 +80,8 @@ class LinkedGraph:
                 print(v1_edges)
                 for j, v2 in enumerate(self._vertex):
                     adj_matrix[i][j] = v1_edges.get(v2, 0)
+
+            print(*adj_matrix, sep='\n')
             return adj_matrix
 
         def get_link_v(v, D):
@@ -93,8 +105,9 @@ class LinkedGraph:
         T = [inf] * N  # последняя строка в таблице
         print(T)
 
-        v0 = 1
-        v = v0  # стартовая вершина (нумерация с нуля)
+        v0 = self._vertex.index(start_v)  # стартовая вершина (нумерация с нуля)
+        found_vertices.append(start_v)
+        v = v0
         S = {v}  # множество просмотренных вершин
         T[v] = 0  # нулевой вес для стартовой вершины
         print(T)
@@ -107,11 +120,17 @@ class LinkedGraph:
                         T[j] = w
 
             v = arg_min(T, S)  # выбираем следующий узел с минимальным весом
-            if v != v0:  # выбрана новая вершина, в оригинале было v > 0
+            if v >= 0:  # выбрана новая вершина, (в оригинале было v > 0). Проверяем, что v не -1
+                # дописать возврат вершин и связей
+                # сделать Т словарем, ключ - суммарные веса, значения - список связей
+                fv = self._vertex[v]
+                found_vertices.append(fv)
+                if fv is stop_v:
+                    break
                 S.add(v)  # добавляем вершину в множество просмотренных
 
         print(f'Вектор весов для вершины {v0}: {T}')
-        return D
+        return found_vertices, found_links
 
 
 # # test_my_example
@@ -142,8 +161,10 @@ for lnk in link_list:
     print(f'{lnk}: {lnk.v1}, {lnk.v2}, {lnk.dist}')
     lg.add_link(lnk)
 
-print(*lg.find_path(v_list[0], v_list[2]), sep='\n')
+print(lg.find_path(v_list[0], v_list[1]))
 
-
-
+# print(Link(v_list[0], v_list[1], 1) == Link(v_list[1], v_list[0], 3))
+# print(len(lg._links))
+# lg.add_link(Link(v_list[1], v_list[0], 3))
+# print(len(lg._links))
 
