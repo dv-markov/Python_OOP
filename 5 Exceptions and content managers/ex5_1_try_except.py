@@ -126,3 +126,40 @@ def convert(value):
         except:
             pass
 
+
+# Task 9
+class Triangle:
+    def __init__(self, a, b, c):
+        self._a = a
+        self._b = b
+        self._c = c
+        self.__verify_triangle(a, b, c)
+
+    def __setattr__(self, key, value):
+        if type(value) not in (int, float) or value <= 0:
+            raise TypeError('стороны треугольника должны быть положительными числами')
+        super().__setattr__(key, value)
+
+    @staticmethod
+    def __verify_triangle(a, b, c):
+        if 2 * max(a, b, c) >= a + b + c:
+            raise ValueError('из указанных длин сторон нельзя составить треугольник')
+
+
+def get_triangle(args):
+    try:
+        return Triangle(*args)
+    except:
+        return None
+
+
+input_data = [(1.0, 4.54, 3), ('abc', 1, 2, 3), (-3, 3, 5.2), (4.2, 5.7, 8.7), (True, 3, 5), (7, 4, 6)]
+lst_tr = list(filter(None, map(get_triangle, input_data)))
+
+print(lst_tr)
+
+
+# Task 10
+class FloatValidator:
+    def __init__(self, min_value, max_value):
+        pass
