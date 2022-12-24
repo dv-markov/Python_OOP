@@ -160,6 +160,41 @@ print(lst_tr)
 
 
 # Task 10
-class FloatValidator:
+class Validator:
+    VALIDATOR_TYPE = None
+
     def __init__(self, min_value, max_value):
-        pass
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def __call__(self, value):
+        if type(value) != self.VALIDATOR_TYPE or not (self.min_value <= value <= self.max_value):
+            raise ValueError('значение не прошло валидацию')
+
+
+class FloatValidator(Validator):
+    VALIDATOR_TYPE = float
+
+
+class IntegerValidator(Validator):
+    VALIDATOR_TYPE = int
+
+
+def is_valid(lst, validators):
+    lst_valid = []
+    for x in lst:
+        for val in validators:
+            try:
+                val(x)
+                lst_valid.append(x)
+                break
+            except ValueError:
+                continue
+    return lst_valid
+
+
+fv = FloatValidator(0, 10.5)
+iv = IntegerValidator(-10, 20)
+lst_out = is_valid([1, 4.5, -10.5, 100, True, 'abc', (1, 2)], validators=[fv, iv])  # [1, 4.5]
+print(lst_out)
+
