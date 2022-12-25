@@ -109,9 +109,9 @@ def get_number(x):
         except Exception:
             return x
 
-# print(get_number('123.0l') + 3)
-s = "1 -5.6 True abc 0 23.56 hello"
+
 # lst_in = input().split()
+s = "1 -5.6 True abc 0 23.56 hello"
 lst_in = s.split()
 
 lst_out = list(map(get_number, lst_in))
@@ -198,6 +198,23 @@ iv = IntegerValidator(-10, 20)
 lst_out = is_valid([1, 4.5, -10.5, 100, True, 'abc', (1, 2)], validators=[fv, iv])  # [1, 4.5]
 print(lst_out)
 
+
+# Variant 1 - my_refactored
+def is_valid(lst, validators):
+    def verify_number(x):
+        for v in validators:
+            try:
+                v(x)
+                return True
+            except:
+                continue
+        return False
+    return list(filter(verify_number, lst))
+
+
+print(is_valid([1, 4.5, -10.5, 100, True, 'abc', (1, 2)], [fv, iv]))
+
+
 # Varaint 2 - Vittorio Zanzara
 # def is_valid(lst, validators):
 #     def validate(x):
@@ -206,4 +223,10 @@ print(lst_out)
 #             except ValueError: continue
 #         return False
 #     return [*filter(validate, lst)]
+
+# Variant 3 - Mikhail Iofik (без try/except)
+# def is_valid(lst, validators):
+#     return [item for item in lst if any(validator(item, True) for validator in validators)]
+
+
 
