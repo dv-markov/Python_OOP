@@ -198,3 +198,12 @@ iv = IntegerValidator(-10, 20)
 lst_out = is_valid([1, 4.5, -10.5, 100, True, 'abc', (1, 2)], validators=[fv, iv])  # [1, 4.5]
 print(lst_out)
 
+# Varaint 2 - Vittorio Zanzara
+# def is_valid(lst, validators):
+#     def validate(x):
+#         for val in validators:
+#             try: return val(x)
+#             except ValueError: continue
+#         return False
+#     return [*filter(validate, lst)]
+
