@@ -47,6 +47,7 @@ except:
 poem_pt2()
 print()
 
+
 # На уровне func1
 def func2():
     return 1 / 0
@@ -84,6 +85,7 @@ poem_pt1()
 func1()
 poem_pt2()
 print()
+
 
 # как только исключение обрабатывается, дальше оно уже не всплывает
 # если обработано исключение func2 error, то func1 error уже не появится
@@ -134,5 +136,65 @@ print()
 
 # Task 4
 class ValidatorString:
-    def __init__(self, min_length, max_length, chars):
-        pass
+    def __init__(self, min_length: int, max_length: int, chars: str):
+        self.min_length = min_length
+        self.max_length = max_length
+        self.chars = set(chars)
+
+    def is_valid(self, string):
+        if not self.min_length <= len(string) <= self.max_length \
+                or (self.chars and not self.chars.intersection(string)):
+            raise ValueError('недопустимая строка')
+
+
+class LoginForm:
+    def __init__(self, login_validator: ValidatorString, password_validator: ValidatorString):
+        self.login_validator = login_validator
+        self.password_validator = password_validator
+        self._login = self._password = None
+
+    def form(self, request: dict):
+        self.verify_request(request)
+        login = request.get('login')
+        password = request.get('password')
+        self.login_validator.is_valid(login)
+        self.password_validator.is_valid(password)
+        self._login = login
+        self._password = password
+
+    @staticmethod
+    def verify_request(req):
+        if not isinstance(req, dict) or \
+                type(req.get('login')) != str or type(req.get('password')) != str:
+            raise TypeError('в запросе отсутствует логин или пароль')
+
+
+login_v = ValidatorString(4, 50, "")
+password_v = ValidatorString(10, 50, "!$#@%&?")
+lg = LoginForm(login_v, password_v)
+# login, password = input().split()
+login, password = 'sergey balakirev!'.split()
+
+try:
+    lg.form({'login': login, 'password': password})
+except (TypeError, ValueError) as e:
+    print(e)
+else:
+    print(lg._login)
+
+
+# Task 5
+class Test:
+    def __init__(self, descr):
+        self.__verify_descr(descr)
+        self.descr = descr
+
+    @staticmethod
+    def __verify_descr(d):
+        min_len = 10
+        max_len = 10_000
+        if not isinstance(d, str) or not min_len <= len(d) <= max_len:
+            raise ValueError('формулировка теста должна быть от 10 до 10 000 символов')
+
+    def
+
