@@ -184,7 +184,10 @@ else:
 
 
 # Task 5
-class Test:
+from abc import ABC, abstractmethod
+
+
+class Test(ABC):
     def __init__(self, descr):
         self.__verify_descr(descr)
         self.descr = descr
@@ -196,5 +199,38 @@ class Test:
         if not isinstance(d, str) or not min_len <= len(d) <= max_len:
             raise ValueError('формулировка теста должна быть от 10 до 10 000 символов')
 
-    def
+    @abstractmethod
+    def run(self):
+        """Абстрактный метод класса Test"""
+        raise NotImplementedError
+
+
+class TestAnsDigit(Test):
+    def __init__(self, descr, ans_digit, max_error_digit=0.01):
+        super().__init__(descr)
+        self.ans_digit = ans_digit
+        self.max_error_digit = max_error_digit
+
+    def __setattr__(self, key, value):
+        if key in ('ans_digit', 'max_error_digit') and type(value) not in (int, float) \
+                or key == 'max_error_digit' and value <= 0:
+            raise ValueError('недопустимые значения аргументов теста')
+        super().__setattr__(key, value)
+
+    def run(self):
+        ans = float(input())
+        return self.ans_digit - self.max_error_digit <= ans <= self.ans_digit + self.max_error_digit
+
+
+# tad = TestAnsDigit('hello world', 123, 321)
+
+# descr, ans = map(str.strip, input().split('|')) # например: Какое значение получится при вычислении 2+2? | 4
+try:
+    # descr, ans = map(str.strip, input().split('|')) # например: Какое значение получится при вычислении 2+2? | 4
+    descr, ans = map(str.strip, 'Какое значение получится при вычислении 2+2? | 4'.split('|'))
+    ans = float(ans)  # здесь для простоты полагаем, что ans точно число и ошибок в преобразовании быть не может
+    tad = TestAnsDigit(descr, ans)
+    print(tad.run())
+except Exception as e:
+    print(e)
 
