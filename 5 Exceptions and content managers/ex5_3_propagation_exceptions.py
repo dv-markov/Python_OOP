@@ -225,12 +225,33 @@ class TestAnsDigit(Test):
 # tad = TestAnsDigit('hello world', 123, 321)
 
 # descr, ans = map(str.strip, input().split('|')) # например: Какое значение получится при вычислении 2+2? | 4
+
+# try:
+#     # descr, ans = map(str.strip, input().split('|')) # например: Какое значение получится при вычислении 2+2? | 4
+#     descr, ans = map(str.strip, 'Какое значение получится при вычислении 2+2? | 4'.split('|'))
+#     ans = float(ans)  # здесь для простоты полагаем, что ans точно число и ошибок в преобразовании быть не может
+#     tad = TestAnsDigit(descr, ans)
+#     print(tad.run())
+# except Exception as e:
+#     print(e)
+
+
+# Task 7
+class TupleLimit(tuple):
+    def __new__(cls, lst, max_length):
+        if len(lst) > max_length:
+            raise ValueError('число элементов коллекции превышает заданный предел')
+        return super().__new__(cls, lst)
+
+    def __repr__(self):
+        return " ".join(map(str, self))
+
+
+digits = list(map(float, input().split()))  # эту строчку не менять (коллекцию digits также не менять)
 try:
-    # descr, ans = map(str.strip, input().split('|')) # например: Какое значение получится при вычислении 2+2? | 4
-    descr, ans = map(str.strip, 'Какое значение получится при вычислении 2+2? | 4'.split('|'))
-    ans = float(ans)  # здесь для простоты полагаем, что ans точно число и ошибок в преобразовании быть не может
-    tad = TestAnsDigit(descr, ans)
-    print(tad.run())
+    t = TupleLimit(digits, 5)
 except Exception as e:
     print(e)
+else:
+    print(t)
 
