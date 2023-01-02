@@ -108,3 +108,49 @@ except ExceptionPrintSendData as e:
     print(e)
 except ExceptionPrint:
     print("Общая ошибка печати")
+
+
+print("""
+Задачи""")
+
+
+# Task 4
+class StringException(Exception):
+    pass
+
+
+class NegativeLengthString(StringException):
+    pass
+
+
+class ExceedLengthString(StringException):
+    pass
+
+
+try:
+    raise NegativeLengthString
+except NegativeLengthString:
+    print("NegativeLengthString")
+except ExceedLengthString:
+    print("ExceedLengthString")
+except StringException:
+    print("StringException")
+
+
+# Task 5
+class PrimaryKeyError(Exception):
+    def __init__(self, **kwargs):
+        if not kwargs or type(kwargs) != dict:
+            self.st = "Первичный ключ должен быть целым неотрицательным числом"
+        else:
+            k = list(kwargs.keys())[0]
+            self.st = f"Значение первичного ключа {k} = {kwargs.get(k)} недопустимо"
+
+    def __str__(self):
+        return self.st
+
+
+try:
+    raise PrimaryKeyError(id=-10.5)
+except PrimaryKeyError as e:
+    print(e)
