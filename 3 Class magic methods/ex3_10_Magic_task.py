@@ -1,20 +1,20 @@
 # 3.10 Испытание магией
-
 import random
+FREE_CELL = '-'
 
 
 class Cell:
     def __init__(self):
-        self.value = 0
+        self.value = FREE_CELL
 
     def __bool__(self):
-        return self.value == 0
+        return self.value == FREE_CELL
 
 
 class TicTacToe:
-    FREE_CELL = 0  # свободная клетка
-    HUMAN_X = 1  # крестик (игрок - человек)
-    COMPUTER_O = 2  # нолик (игрок - компьютер)
+    FREE_CELL = FREE_CELL  # свободная клетка
+    HUMAN_X = 'X'  # крестик (игрок - человек)
+    COMPUTER_O = '0'  # нолик (игрок - компьютер)
 
     def __init__(self, f_size=3):
         self.f_size = f_size
@@ -38,7 +38,7 @@ class TicTacToe:
     def init(self):
         for row in self.pole:
             for cell in row:
-                cell.value = 0
+                cell.value = self.FREE_CELL
 
     def show(self):
         for row in self.pole:
@@ -99,13 +99,17 @@ class TicTacToe:
 # print('Draw: ', game.is_draw())
 # print('Game not over: ', bool(game))
 
-game = TicTacToe(5)
+game = TicTacToe(3)
 game.init()
 step_game = 0
 while game:
     game.show()
     if step_game % 2 == 0:
-        game.human_go()
+        try:
+            game.human_go()
+        except Exception as e:
+            print(e)
+            step_game -= 1
     else:
         game.computer_go()
 
@@ -119,4 +123,3 @@ elif game.is_computer_win:
     print("Game over. Все получится, со временем")
 else:
     print("Ничья.")
-
