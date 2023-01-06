@@ -78,7 +78,7 @@ class ExceptionPrintSendData(Exception):
         self.message = args[0] if args else None
 
     def __str__(self):
-        return f"Ошибка: {self.message}"
+        return f"Ошибка 1: {self.message}"
 
 
 p = PrintData()
@@ -98,7 +98,7 @@ class ExceptionPrintSendData(ExceptionPrint):
         self.message = args[0] if args else None
 
     def __str__(self):
-        return f"Ошибка: {self.message}"
+        return f"Ошибка 2: {self.message}"
 
 
 p = PrintData()
@@ -279,16 +279,17 @@ class TupleData:
         if any(not isinstance(x, Cell) for x in args):
             raise TypeError('Аргументы должны быть объектами класса Cell или его дочерних классов')
 
-    def __verify_indx(self, indx):
-        if indx not in range(len(self._cells)):
-            raise IndexError('Индекс ячейки выходит за допустимый диапазон')
+    # верифицировать индекс не обязательно, это исключение будет генерироваться автоматически
+    # def __verify_indx(self, indx):
+    #     if indx not in range(len(self._cells)):
+    #         raise IndexError('Индекс ячейки выходит за допустимый диапазон')
 
     def __getitem__(self, item):
-        self.__verify_indx(item)
+        # self.__verify_indx(item)
         return self._cells[item].value
 
     def __setitem__(self, key, value):
-        self.__verify_indx(key)
+        # self.__verify_indx(key)
         self._cells[key].value = value
 
     def __len__(self):
@@ -323,3 +324,10 @@ print(f"Общее число элементов: {res}")
 for d in ld:  # перебирает значения ячеек объекта ld (значения, а не объекты ячеек)
     print(d)
 
+
+# Variant 2 - Balakirev - формирование базового класса с универсальным методом __init__ для дочерних
+# class Cell:
+#     def __init__(self, **kwargs):
+#         for k, v in kwargs:
+#             setattr(self, '_' + k, v)
+#         self.__value = None
