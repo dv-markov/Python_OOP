@@ -59,11 +59,11 @@ class Ship:
             return x1 <= x2 <= x1 + dx and y1 <= y2 <= y1 + dy
 
         rect_x, rect_y = (coord - 1 for coord in ship.get_start_coords())
-        # ship_dx = ship.length + 2 if ship.tp == 1 else 3
-        # ship_dy = ship.length + 2 if ship.tp == 2 else 3
+        # ship_dx = ship.length + 1 if ship.tp == 1 else 1
+        # ship_dy = ship.length + 1 if ship.tp == 2 else 1
         # self_dx = self.length - 1 if self._tp == 1 else 0
         # self_dy = self.length - 1 if self._tp == 2 else 0
-        ship_dx, ship_dy = (ship.length + 2, 3)[::(-1, 1)[ship.tp == 1]]
+        ship_dx, ship_dy = (ship.length + 1, 2)[::(-1, 1)[ship.tp == 1]]
         self_dx, self_dy = (self.length - 1, 0)[::(-1, 1)[self._tp == 1]]
         return collision(rect_x, rect_y, ship_dx, ship_dy, self._x, self._y) \
                or collision(rect_x, rect_y, ship_dx, ship_dy, self._x + self_dx, self._y + self_dy)
@@ -96,9 +96,10 @@ class GamePole:
         self._ships = []
 
     def init(self):
-        fleet = {4: 1, 3: 2, 2: 3, 1: 4}
+        # fleet = {4: 1, 3: 2, 2: 3, 1: 4}
+        fleet = {4: 1, 3: 2}
         for ship_length, ship_number in fleet.items():
-            self._ships.extend(Ship(ship_length, tp=(randint(1, 2)), x=randint(0, 9), y=randint(0,9))
+            self._ships.extend(Ship(ship_length, tp=(randint(1, 2)), x=randint(0, 9), y=randint(0, 9))
                                for _ in range(ship_number))
 
     def check_collision(self):
@@ -106,7 +107,7 @@ class GamePole:
             temp_fleet = self._ships[:]
             temp_fleet.remove(ship1)
             for ship2 in temp_fleet:
-                ship1.is_collide(ship2)
+                print(f'Пересечение {ship1} и {ship2}: {ship1.is_collide(ship2)}')
 
 
 sh = Ship(4, 2, 1, 2)
