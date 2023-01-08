@@ -5,8 +5,9 @@ from random import randint, shuffle
 FIELD_SIZE = 10
 
 
-class ShipCollisionError(Exception):
-    pass
+class ShipError(Exception): pass
+class ShipCollisionError(ShipError): pass
+class ShipValueError(ShipError): pass
 
 
 class Ship:
@@ -23,14 +24,14 @@ class Ship:
             case '_x' | '_y':
                 # verify coords
                 if value is not None and (type(value) != int or not 0 <= value < FIELD_SIZE):
-                    raise ValueError(f'Координаты корабля должны быть '
+                    raise ShipValueError(f'Координаты корабля должны быть '
                                      f'целыми числами в диапазоне от 0 до {FIELD_SIZE - 1}')
             case '_length':
                 if type(value) != int or not 0 < value < 5:
-                    raise ValueError('Длина корабля должна быть целым числом в диапазоне от 1 до 4')
+                    raise ShipValueError('Длина корабля должна быть целым числом в диапазоне от 1 до 4')
             case '_tp':
                 if value not in (1, 2):
-                    raise ValueError('Ориентация корабля должна быть 1 (горизонтальная) или 2 (вертикальная)')
+                    raise ShipValueError('Ориентация корабля должна быть 1 (горизонтальная) или 2 (вертикальная)')
         super().__setattr__(key, value)
 
     @property
@@ -59,10 +60,10 @@ class Ship:
             self._x += go
         elif self._is_move and self._tp == 2:
             self._y += go
-        else:
-            return False
-
-        return True
+        # else:
+        #     return False
+        #
+        # return True
 
     def is_collide(self, ship):
         def collision(x1, y1, dx, dy, x2, y2):
@@ -80,6 +81,9 @@ class Ship:
             return self._x + self._length > size
         elif self._tp == 2:
             return self._y + self._length > size
+
+    def is_alive(self):
+        return self._is_move
 
     def __getitem__(self, item):
         return self._cells[item]
@@ -119,7 +123,7 @@ class GamePole:
     def check_collision(self, ship1):
         temp_fleet = [s for s in self._ships if s and s is not ship1]
         for ship2 in temp_fleet:
-            print(f'Пересечение {ship1} и {ship2}: {ship1.is_collide(ship2)}')
+            # print(f'Пересечение {ship1} и {ship2}: {ship1.is_collide(ship2)}')
             if ship1.is_collide(ship2):
                 raise ShipCollisionError
 
@@ -127,15 +131,25 @@ class GamePole:
         return self._ships
 
     def move_ships(self):
+        directions = [-1, 1]
         for ship in self._ships:
-            if ship._is_move:
-                directions = (-1, 1)
+            if ship.is_alive():
+                tmp_coords = ship.get_start_coords()
+                shuffle(directions)
                 for d in directions:
-                    tmp_ship = ship
-                    pass
-
-
-
+                    try:
+                        ship.move(d)
+                        self.check_collision(ship)
+                        if ship.is_out_pole(self.size):
+                            raise ShipValueError('Выход за пределы поля')
+                    except ShipError as e:
+                        # print(e)
+                        ship.set_start_coords(*tmp_coords)
+                    else:
+                        # print(f'{ship} перемещен на {d} клетку с {tmp_coords}')
+                        break
+                # else:
+                #     print(f'{ship} не может быть перемещен')
 
     def show(self):
         for line in self.get_pole():
@@ -150,15 +164,16 @@ class GamePole:
             elif ship.tp == 2:
                 for i in range(ship.length):
                     pole[y + i][x] = ship.cells[i]
-        return tuple(pole)
+        return tuple(tuple(line) for line in pole)
 
 
+SIZE_GAME_POLE = 10
 
+pole = GamePole(SIZE_GAME_POLE)
+pole.init()
+pole.show()
 
-gp = GamePole()
-gp.init()
-print(gp.__dict__)
+pole.move_ships()
 print()
-
-gp.show()
+pole.show()
 
