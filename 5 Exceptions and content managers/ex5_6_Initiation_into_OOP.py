@@ -1,8 +1,12 @@
 # 5.6 Посвящение в объектно-ориентированное программирование
 # Морской бой
-from random import randint
+from random import randint, shuffle
 
 FIELD_SIZE = 10
+
+
+class ShipCollisionError(Exception):
+    pass
 
 
 class Ship:
@@ -37,8 +41,11 @@ class Ship:
     def tp(self):
         return self._tp
 
+    @property
+    def cells(self):
+        return self._cells
+
     def set_start_coords(self, x, y):
-        """Установка начальных координат (запись значений в локальные атрибуты _x, _y);"""
         self._x, self._y = x, y
 
     def get_start_coords(self):
@@ -48,21 +55,20 @@ class Ship:
         """Перемещение корабля в направлении его ориентации на go клеток
         (go = 1 - движение в одну сторону на клетку; go = -1 - движение в другую сторону на одну клетку);
         движение возможно только если флаг _is_move = True"""
-        pass
+        if self._is_move and self._tp == 1:
+            self._x += go
+        elif self._is_move and self._tp == 2:
+            self._y += go
+        else:
+            return False
+
+        return True
 
     def is_collide(self, ship):
-        """Проверка на столкновение с другим кораблем ship
-        (столкновением считается, если другой корабль или пересекается с текущим или просто соприкасается,
-        в том числе и по диагонали);
-        метод возвращает True, если столкновение есть и False - в противном случае"""
         def collision(x1, y1, dx, dy, x2, y2):
             return x1 <= x2 <= x1 + dx and y1 <= y2 <= y1 + dy
 
         rect_x, rect_y = (coord - 1 for coord in ship.get_start_coords())
-        # ship_dx = ship.length + 1 if ship.tp == 1 else 1
-        # ship_dy = ship.length + 1 if ship.tp == 2 else 1
-        # self_dx = self.length - 1 if self._tp == 1 else 0
-        # self_dy = self.length - 1 if self._tp == 2 else 0
         ship_dx, ship_dy = (ship.length + 1, 2)[::(-1, 1)[ship.tp == 1]]
         self_dx, self_dy = (self.length - 1, 0)[::(-1, 1)[self._tp == 1]]
         return collision(rect_x, rect_y, ship_dx, ship_dy, self._x, self._y) \
@@ -70,12 +76,10 @@ class Ship:
         # проверяем попадает ли своя голова или хвост в область вокруг другого корабля
 
     def is_out_pole(self, size):
-        """Проверка на выход корабля за пределы игрового поля (size - размер игрового поля, обычно, size = 10);
-        возвращается булево значение True, если корабль вышел из игрового поля и False - в противном случае"""
         if self._tp == 1:
-            return self._x + self._length > size - 1
+            return self._x + self._length > size
         elif self._tp == 2:
-            return self._y + self._length > size - 1
+            return self._y + self._length > size
 
     def __getitem__(self, item):
         return self._cells[item]
@@ -89,6 +93,9 @@ class Ship:
         return f"Корабль {f'{self._length}-х палубный' if self._length > 1 else 'однопалубный'} / " \
                f"x={self._x} y={self._y} / ориентация {('горизонтальная', 'вертикальная')[self._tp - 1]}: {self._cells}"
 
+    def __bool__(self):
+        return self._x is not None and self._y is not None
+
 
 class GamePole:
     def __init__(self, size: int = FIELD_SIZE):
@@ -96,25 +103,62 @@ class GamePole:
         self._ships = []
 
     def init(self):
-        # fleet = {4: 1, 3: 2, 2: 3, 1: 4}
-        fleet = {4: 1, 3: 2}
+        fleet = {4: 1, 3: 2, 2: 3, 1: 4}
         for ship_length, ship_number in fleet.items():
-            self._ships.extend(Ship(ship_length, tp=(randint(1, 2)), x=randint(0, 9), y=randint(0, 9))
-                               for _ in range(ship_number))
+            self._ships.extend(Ship(ship_length, tp=(randint(1, 2))) for _ in range(ship_number))
 
-    def check_collision(self):
-        for ship1 in self._ships:
-            temp_fleet = self._ships[:]
-            temp_fleet.remove(ship1)
-            for ship2 in temp_fleet:
-                print(f'Пересечение {ship1} и {ship2}: {ship1.is_collide(ship2)}')
+        for ship in self._ships:
+            while not ship or ship.is_out_pole(self.size):
+                try:
+                    ship.set_start_coords(randint(0, 9), randint(0, 9))
+                    self.check_collision(ship)
+                except ShipCollisionError:
+                    ship.set_start_coords(None, None)
+                    continue
+
+    def check_collision(self, ship1):
+        temp_fleet = [s for s in self._ships if s and s is not ship1]
+        for ship2 in temp_fleet:
+            print(f'Пересечение {ship1} и {ship2}: {ship1.is_collide(ship2)}')
+            if ship1.is_collide(ship2):
+                raise ShipCollisionError
+
+    def get_ships(self):
+        return self._ships
+
+    def move_ships(self):
+        for ship in self._ships:
+            if ship._is_move:
+                directions = (-1, 1)
+                for d in directions:
+                    tmp_ship = ship
+                    pass
 
 
-sh = Ship(4, 2, 1, 2)
-print(sh.__dict__)
+
+
+    def show(self):
+        for line in self.get_pole():
+            print(*line)
+
+    def get_pole(self):
+        pole = [[0 for _ in range(self.size)] for _ in range(self.size)]
+        for ship in self._ships:
+            x, y = ship.get_start_coords()
+            if ship.tp == 1:
+                pole[y][x:x+ship.length] = ship.cells
+            elif ship.tp == 2:
+                for i in range(ship.length):
+                    pole[y + i][x] = ship.cells[i]
+        return tuple(pole)
+
+
+
 
 gp = GamePole()
 gp.init()
 print(gp.__dict__)
-gp.check_collision()
+print()
+
+gp.show()
 
