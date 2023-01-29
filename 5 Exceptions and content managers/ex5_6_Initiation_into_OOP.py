@@ -17,7 +17,7 @@ class Ship:
         self._length = length
         self._tp = tp
         self._is_move = True
-        self._cells = [1] * length
+        self._cells = ['O'] * length
 
     def __setattr__(self, key, value):
         match key:
@@ -156,7 +156,7 @@ class GamePole:
             print(*line)
 
     def get_pole(self):
-        pole = [[0 for _ in range(self.size)] for _ in range(self.size)]
+        pole = [['.' for _ in range(self.size)] for _ in range(self.size)]
         for ship in self._ships:
             x, y = ship.get_start_coords()
             if ship.tp == 1:
@@ -176,4 +176,3 @@ pole.show()
 pole.move_ships()
 print()
 pole.show()
-
