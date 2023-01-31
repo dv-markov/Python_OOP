@@ -176,3 +176,5 @@ pole.show()
 pole.move_ships()
 print()
 pole.show()
+
+
